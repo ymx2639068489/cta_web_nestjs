@@ -6,21 +6,18 @@ import { CreateUserDto, CreateUserIdentityDto, UserLoginDto } from '../../dto/us
 import { User, UserIdentity } from '../../entities/users';
 import { Result } from '../../common/interface/result';
 
-import { AuthService } from '../autuh/auth.service';
 @Injectable()
-export class UsersService {
+export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     @InjectRepository(UserIdentity)
     private readonly userIdentityRepository: Repository<UserIdentity>,
     private readonly connection: Connection,
-    // 循环引用解决办法
-    private readonly authService: AuthService,
   ) {}
   
   async findOne(studentId: string) {
-    return this.userRepository.findOne({ where: studentId });
+    return this.userRepository.findOne({ where: { studentId } });
   }
 
   async createUser(
@@ -36,6 +33,7 @@ export class UsersService {
         ...createUserDto,
         identity
       })
+      // console.log(item);
       await this.userRepository.save(item);
       return { code: 0, message: '注册成功' };
     } catch (err) {
@@ -76,6 +74,6 @@ export class UsersService {
 
     if (user.password !== password) return { code: -1, message: '密码错误', data: '' };
 
-    return this.authService.certificate(user);
+    // return this.authService.certificate(user);
   }
 }

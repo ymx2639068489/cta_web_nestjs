@@ -30,23 +30,38 @@ export class User extends BaseEntity {
   // 学院
   @Column({
     comment: '学院',
+    nullable: true,
   })
-  college: string;
+  college?: string;
   // 专业
   @Column({
     comment: '专业',
+    nullable: true,
   })
-  major: string;
+  major?: string;
   // 班级
   @Column({
     comment: '班级',
+    nullable: true,
   })
-  class: string;
+  class?: string;
   // QQ
   @Column({
     comment: 'QQ',
+    nullable: true,
   })
-  qq: string;
+  qq?: string;
+  // 手机号
+  @Column({
+    comment: 'phoneNumber',
+  })
+  phoneNumber: string;
+  // 手机号
+  @Column({
+    comment: 'avatarUrl',
+    nullable: true,
+  })
+  avatarUrl?: string;
   // 身份
   @ManyToOne(() => UserIdentity, (userIdentity) => userIdentity.users)
   identity: UserIdentity;

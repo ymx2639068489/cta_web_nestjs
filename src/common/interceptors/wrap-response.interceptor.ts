@@ -28,7 +28,7 @@ export class WrapResponseInterceptor implements NestInterceptor {
     const req = context.getArgByIndex(1).req;
     return next.handle().pipe(
       map((data) => {
-        if (data.response?.statusCode) {
+        if (data?.response?.statusCode) {
           Logger.fatal('响应失败fatal');
           return {
             code: -1,

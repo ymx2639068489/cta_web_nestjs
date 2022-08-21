@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
-import { UsersModule } from './modules/users/users.module';
+import { UserModule } from './modules/user/user.module';
 import { RecruitmentModule } from './modules/recruitment/recruitment.module';
 import { ConfigModule } from '@nestjs/config';
 import appConfig from './config/app.config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CommonModule } from './common/common.module';
-import { ModuleCommonModule } from './modules/common/common.module';
-import { AuthModule } from './modules/autuh/auth.module';
-import { UsersController } from './modules/users/users.controller';
+// import { _CommonModule } from './modules/common/common.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { UserController } from './modules/user/user.controller';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -24,12 +24,12 @@ import { UsersController } from './modules/users/users.controller';
       synchronize: true, // 同步数据库，如果不存在则创自动创建, 开发环境谨慎使用
     }),
     CommonModule,
-    UsersModule,
+    UserModule,
     RecruitmentModule,
-    ModuleCommonModule,
+    // _CommonModule,
     AuthModule,
   ],
-  controllers: [],
+  controllers: [UserController],
   providers: [],
 })
 export class AppModule {}
