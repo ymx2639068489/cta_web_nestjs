@@ -3,7 +3,7 @@ import { CommonService } from './common.service';
 import { getPublicKey } from '../../common/utils/encryption';
 import { ApiProperty, ApiTags } from '@nestjs/swagger';
 import { Result } from '../../common/interface/result';
-import { ApiOk } from '../../common/decorators/ApiResult.decorators';
+
 @ApiTags('common')
 @Controller('common')
 export class CommonController {
@@ -11,7 +11,6 @@ export class CommonController {
 
   @Get('getPublicEncryptKey')
   @ApiProperty({ description: '获取加密密钥' })
-  @ApiOk(String)
   getPublicEncryptKey(): Result<string> {
     return {
       code: 0,

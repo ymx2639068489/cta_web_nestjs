@@ -25,6 +25,7 @@ async function bootstrap() {
     .setTitle('CTA_WEB_API_DOCUMENT')
     .setDescription('The CTA_WEB_API_DOCUMENT API description')
     // .setVersion('1.0.0')
+    .addBearerAuth()
     .addTag('CTA_WEB_API_DOCUMENT')
     .build();
   const document = SwaggerModule.createDocument(app, options);
@@ -50,6 +51,7 @@ async function bootstrap() {
     new WrapResponseInterceptor(),
     new TimeoutInterceptor(),
   );
+
   // app.use(new HttpRequestMiddleware().use)
   await app.listen(3001);
 }

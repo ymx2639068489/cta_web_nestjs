@@ -1,6 +1,6 @@
 // noinspection JSConstantReassignment
 
-import { CommonResponse } from '@/src/common/interceptors/transform.interceptor';
+import { CommonResponse } from '@/common/interceptors/transform.interceptor';
 import { Type } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
 import { ApiPropertyOptions } from '@nestjs/swagger/dist/decorators/api-property.decorator';

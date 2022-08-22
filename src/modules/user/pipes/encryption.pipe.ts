@@ -11,6 +11,7 @@ import { decrypt, encrypt } from '../../../common/utils/encryption';
 export class createUserPipe implements PipeTransform {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   transform(value: any, _metadata: ArgumentMetadata) {
+    console.log('userLoginPipe解密中');
     // try {
     //   value.studentId = decrypt(value.studentId);
     //   value.phoneNumber = decrypt(value.qq);
@@ -30,6 +31,7 @@ export class createUserPipe implements PipeTransform {
 export class userLoginPipe implements PipeTransform {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   transform(value: any, _metadata: ArgumentMetadata) {
+    console.log('userLoginPipe解密中');
     const val = { ...value };
     // try {
     //   val.studentId = decrypt(value.studentId);

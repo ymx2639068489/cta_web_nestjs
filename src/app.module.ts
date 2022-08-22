@@ -5,9 +5,9 @@ import { ConfigModule } from '@nestjs/config';
 import appConfig from './config/app.config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CommonModule } from './common/common.module';
-// import { _CommonModule } from './modules/common/common.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UserController } from './modules/user/user.controller';
+import { _CommonModule } from './modules/common/common.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -26,7 +26,7 @@ import { UserController } from './modules/user/user.controller';
     CommonModule,
     UserModule,
     RecruitmentModule,
-    // _CommonModule,
+    _CommonModule,
     AuthModule,
   ],
   controllers: [UserController],

@@ -1,7 +1,7 @@
 import { forwardRef, HttpException, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Connection, Repository } from 'typeorm';
-import { CreateUserDto, CreateUserIdentityDto, UserLoginDto } from '../../dto/users';
+import { CreateUserDto, CreateUserIdentityDto, UpdateUserDto, UserLoginDto } from '../../dto/users';
 
 import { User, UserIdentity } from '../../entities/users';
 import { Result } from '../../common/interface/result';
@@ -15,8 +15,8 @@ export class UserService {
     private readonly userIdentityRepository: Repository<UserIdentity>,
     private readonly connection: Connection,
   ) {}
-  
-  async findOne(studentId: string) {
+  async findOne(studentId: string): Promise<User> {
+    // return this.users.find((user) => user.username === username);
     return this.userRepository.findOne({ where: { studentId } });
   }
 
@@ -66,14 +66,33 @@ export class UserService {
     }
   }
 
-  async userlogin(
-    { studentId, password }: UserLoginDto
+  async update(
+    studentId: string,
+    updateUserDto: UpdateUserDto
   ): Promise<Result<string>> {
     const user = await this.findOne(studentId);
-    if (!user) return { code: -2, message: '账号未注册', data: '' };
+    if (!user) {
+      return {
+        code: -2,
+        message: `student with studentId ${studentId} not found, 当前用户状态错误，请重写登录`
+      };
+    }
 
-    if (user.password !== password) return { code: -1, message: '密码错误', data: '' };
-
-    // return this.authService.certificate(user);
+    const updateUser = await this.userRepository.preload({
+      id: user.id,
+      ...updateUserDto
+    })
+    if (!updateUser) {
+      return {
+        code: -2,
+        message: `student with studentId ${studentId} not found, 当前用户状态错误，请重写登录`
+      };
+    }
+    try {
+      await this.userRepository.save(updateUser);
+      return { code: 0, message: '修改成功' };
+    } catch (err) {
+      return { code: -2, message: err };
+    }
   }
 }

@@ -1,58 +1,56 @@
-import { Controller, Post, Body, UsePipes, Patch, UseGuards } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
+import { Controller, Post, Body, UseGuards, Get, Request, Patch } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto, UserLoginDto } from '../../dto/users';
-import { Result } from '../../common/interface/result';
-import { createUserPipe, userLoginPipe } from './pipes/encryption.pipe';
-import { ApiHeader, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { warpResponse } from '@/src/common/interceptors';
+import { CreateUserDto, UpdateUserDto, UserLoginDto } from '@/dto/users';
+import { Result } from '@/common/interface/result';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { warpResponse } from '@/common/interceptors';
 import { AuthService } from '../auth/auth.service';
-// import { AuthGuard } from '@nestjs/passport';
-// import { JwtAuthGuard } from '../autuh/jwt.auth.guard';
+import { JwtAuthGuard, LocalAuthGuard } from '@/common/guard';
+import { getUserInfoDto } from '@/dto/users';
+
 @ApiTags('users')
 @Controller('users')
 export class UserController {
   constructor(
     private readonly authService: AuthService,
-    private readonly usersService: UserService
+    private readonly userService: UserService
   ) {}
 
   @Post('login')
-  @UsePipes(new userLoginPipe())
-  @ApiResponse({
-    type: warpResponse({ type: 'string' })
-  })
-  async userLogin(
-    @Body() userLoginDto: UserLoginDto
-  ) {
-    console.log('JWT验证 - Step 1: 用户请求登录');
-    const authResult = await this.authService.validateUser(
-      userLoginDto.studentId,
-      userLoginDto.password
-    );
-    switch (authResult.code) {
-      case 1:
-        return this.authService.certificate(authResult.user);
-      case 2:
-        return {
-          code: 600,
-          msg: `账号或密码不正确`,
-        };
-      default:
-        return {
-          code: 600,
-          msg: `查无此人`,
-        };
-    }
-  }
-  @UseGuards(AuthGuard('jwt')) // 使用 'JWT' 进行验证
-  @Post('register')
-  // 数据加密、解密、解析
-  @UsePipes(new createUserPipe())
+  @UseGuards(LocalAuthGuard)
   @ApiResponse({ type: warpResponse({ type: 'string' }) })
-  async createUser(
-    @Body() createUserDto: CreateUserDto,
+  async userLogin(
+    @Request() req: any,
+    @Body() _userLoginDto: UserLoginDto
   ): Promise<Result<string>> {
-    return await this.usersService.createUser(createUserDto);
-  } 
+    // 获取签证后的jwt-token
+    return { code: 0, message: '登录成功', data: this.authService.login(req.user) };
+  }
+
+  @Get('getUserInfo')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @ApiResponse({ type: warpResponse({ type: getUserInfoDto }) })
+  getProfile(@Request() req: any) {
+    return { code: 0, message: '获取成功', data: req.user };
+  }
+
+  @Post('register')
+  @ApiResponse({ type: warpResponse({ type: 'string' }) })
+  async create(
+    @Body() createUserDto: CreateUserDto
+  ): Promise<Result<string>> {
+    return await this.userService.createUser(createUserDto);
+  }
+
+  @Patch('updateUserInfo')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @ApiResponse({ type: warpResponse({ type: 'string' }) })
+  async update(
+    @Request() req: any,
+    @Body() updateUserDto: UpdateUserDto,
+  ): Promise<Result<string>> {
+    return await this.userService.update(req.user.studentId, updateUserDto);
+  }
 }
