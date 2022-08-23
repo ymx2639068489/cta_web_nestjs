@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, CacheModule } from '@nestjs/common';
 import { UserModule } from './modules/user/user.module';
 import { RecruitmentModule } from './modules/recruitment/recruitment.module';
 import { ConfigModule } from '@nestjs/config';
@@ -8,6 +8,7 @@ import { CommonModule } from './common/common.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UserController } from './modules/user/user.controller';
 import { _CommonModule } from './modules/common/common.module';
+import { EmailModule } from './modules/email/email.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -28,6 +29,7 @@ import { _CommonModule } from './modules/common/common.module';
     RecruitmentModule,
     _CommonModule,
     AuthModule,
+    EmailModule,
   ],
   controllers: [UserController],
   providers: [],

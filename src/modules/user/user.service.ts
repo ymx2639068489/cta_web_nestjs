@@ -1,11 +1,11 @@
-import { forwardRef, HttpException, Inject, Injectable } from '@nestjs/common';
+import { CACHE_MANAGER, forwardRef, HttpException, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Connection, Repository } from 'typeorm';
 import { CreateUserDto, CreateUserIdentityDto, UpdateUserDto, UserLoginDto } from '../../dto/users';
 
 import { User, UserIdentity } from '../../entities/users';
 import { Result } from '../../common/interface/result';
-
+import { Cache } from 'cache-manager';
 @Injectable()
 export class UserService {
   constructor(
@@ -74,18 +74,19 @@ export class UserService {
     if (!user) {
       return {
         code: -2,
-        message: `student with studentId ${studentId} not found, 当前用户状态错误，请重写登录`
+        message: `student with studentId ${studentId} not found, 当前用户状态错误`
       };
     }
 
     const updateUser = await this.userRepository.preload({
       id: user.id,
-      ...updateUserDto
+      ...updateUserDto,
+      studentId // 学号和id不能变
     })
     if (!updateUser) {
       return {
         code: -2,
-        message: `student with studentId ${studentId} not found, 当前用户状态错误，请重写登录`
+        message: `student with studentId ${studentId} not found, 当前用户状态错误`
       };
     }
     try {

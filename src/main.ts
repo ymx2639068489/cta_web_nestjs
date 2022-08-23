@@ -24,7 +24,7 @@ async function bootstrap() {
   const options = new DocumentBuilder()
     .setTitle('CTA_WEB_API_DOCUMENT')
     .setDescription('The CTA_WEB_API_DOCUMENT API description')
-    // .setVersion('1.0.0')
+    .setVersion('1.1.2')
     .addBearerAuth()
     .addTag('CTA_WEB_API_DOCUMENT')
     .build();

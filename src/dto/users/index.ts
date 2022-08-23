@@ -4,3 +4,4 @@ export * from './user-identity.dto';
 export * from './user-login.dto';
 export * from './create-user.dto';
 export * from './getUserInfo.dto';
+export * from './forgotPassword.dto';
