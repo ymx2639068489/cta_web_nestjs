@@ -16,8 +16,8 @@ import { Logger } from '../utils/log4js/index';
 @Injectable()
 export class WrapResponseInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-    console.log('interceptor before...');
-    Logger.log('收到请求');
+    const req = context.getArgByIndex(1).req;
+    Logger.log(`收到请求 ---> ${req.route.path}`);
     // const req = context.switchToHttp().getRequest();
     // // get hreaders and body
     // const headers_key = Reflect.ownKeys(req).filter(
@@ -25,17 +25,17 @@ export class WrapResponseInterceptor implements NestInterceptor {
     // )[0];
     // const headers = req[headers_key]; // headers
     // const body = req.body; // body
-    const req = context.getArgByIndex(1).req;
+    // console.log(req);
     return next.handle().pipe(
       map((data) => {
         if (data?.response?.statusCode) {
-          Logger.fatal('响应失败fatal');
+          Logger.fatal(`响应失败fatal ---> ${req.route.path}`);
           return {
             code: -1,
             ...data.response,
           };
         }
-        Logger.log('响应成功');
+        Logger.log(`响应成功 ---> ${req.route.path}`);
         return {
           code: 0,
           ...data,

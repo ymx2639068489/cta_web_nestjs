@@ -17,7 +17,10 @@ export class UserService {
   ) {}
   async findOne(studentId: string): Promise<User> {
     // return this.users.find((user) => user.username === username);
-    return this.userRepository.findOne({ where: { studentId } });
+    return this.userRepository.findOne({
+      where: { studentId },
+      relations: ['identity']
+    });
   }
 
   async createUser(

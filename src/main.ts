@@ -15,11 +15,15 @@ import {
 } from './common/interceptors';
 
 async function bootstrap() {
-  const appConfig = { cors: true };
+  const appConfig = {
+    cors: true,
+    abortOnError: false,
+  };
   const app = await NestFactory.create(AppModule, appConfig);
 
   app.setGlobalPrefix('api');
 
+  // app.useStaticAssets()
   // swagger
   const options = new DocumentBuilder()
     .setTitle('CTA_WEB_API_DOCUMENT')
@@ -58,6 +62,8 @@ async function bootstrap() {
 
 bootstrap();
 /**
+ * 3001 is development
+ * 3004 is process
  * class-validator class-transformer // 参数转换和验证
  * @nestjs/typeorm typeorm 0.2.x mysql // 实体类型orm
  * @nestjs/config // 配置文件

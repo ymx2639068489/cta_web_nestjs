@@ -1,14 +1,15 @@
-import { Controller, Post, Body, UseGuards, Get, Request, Patch, Param, Put } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Get, Request, Patch, Param, Put, Query } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto, UpdateUserDto, UserLoginDto } from '@/dto/users';
 import { Result } from '@/common/interface/result';
-import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { warpResponse } from '@/common/interceptors';
 import { AuthService } from '../auth/auth.service';
-import { JwtAuthGuard, LocalAuthGuard } from '@/common/guard';
 import { getUserInfoDto } from '@/dto/users';
 import { EmailService } from '../email/email.service';
-import { ForgotPasswordDto } from '@/dto/users'
+import { ForgotPasswordDto } from '@/dto/users';
+import { NoAuth } from '@/common/decorators/Role/customize';
+
 @ApiTags('users')
 @Controller('users')
 export class UserController {
@@ -19,7 +20,7 @@ export class UserController {
   ) {}
 
   @Post('login')
-  @UseGuards(LocalAuthGuard)
+  @NoAuth(-1)
   @ApiResponse({ type: warpResponse({ type: 'string' }) })
   async userLogin(
     @Request() req: any,
@@ -31,23 +32,20 @@ export class UserController {
 
   @Get('getUserInfo')
   @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
   @ApiResponse({ type: warpResponse({ type: getUserInfoDto }) })
   getProfile(@Request() req: any) {
     return { code: 0, message: '获取成功', data: req.user };
   }
 
   @Post('register')
+  @NoAuth(0)
   @ApiResponse({ type: warpResponse({ type: 'string' }) })
-  async create(
-    @Body() createUserDto: CreateUserDto
-  ): Promise<Result<string>> {
+  async create(@Body() createUserDto: CreateUserDto): Promise<Result<string>> {
     return await this.userService.createUser(createUserDto);
   }
 
   @Put('updateUserInfo')
   @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
   @ApiResponse({ type: warpResponse({ type: 'string' }) })
   async update(
     @Request() req: any,
@@ -56,18 +54,25 @@ export class UserController {
     return await this.userService.update(req.user.studentId, updateUserDto);
   }
 
-  @Get('sendVerificationCode/:studentId/:qq')
+  @Get('sendVerificationCode')
+  @NoAuth(0)
   @ApiResponse({ type: warpResponse({ type: 'string' }) })
+  @ApiQuery({ name: 'qq', required: true })
+  @ApiQuery({ name: 'studentId', required: true })
   async sendVerificationCode(
-    @Param('qq') qq: string,
-    @Param('studentId') studentId: string,
+    @Query('qq') qq: string,
+    @Query('studentId') studentId: string,
   ): Promise<Result<string>> {
     const user = await this.userService.findOne(studentId);
     if (!user || user.qq !== qq) return { code: -4, message: '用户不存在，请先注册' };
-    return await this.emailService.sendEmailCode({ email: qq + '@qq.com' });
+    return await this.emailService.sendEmailCode({
+      email: qq + '@qq.com',
+      subject: '用户邮箱验证',
+    });
   }
 
   @Patch('updateUserPassword')
+  @NoAuth(0)
   @ApiResponse({ type: warpResponse({ type: 'string' }) })
   async forgotPassword(
     @Body() forgotPasswordDto: ForgotPasswordDto

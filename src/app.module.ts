@@ -9,6 +9,9 @@ import { AuthModule } from './modules/auth/auth.module';
 import { UserController } from './modules/user/user.controller';
 import { _CommonModule } from './modules/common/common.module';
 import { EmailModule } from './modules/email/email.module';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtAuthGuard } from './common/guard/jwt.guard';
+import { TasksModule } from './tasks/tasks.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -30,8 +33,15 @@ import { EmailModule } from './modules/email/email.module';
     _CommonModule,
     AuthModule,
     EmailModule,
+    TasksModule,
   ],
   controllers: [UserController],
-  providers: [],
+  providers: [
+    // 全局使用jwt验证
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    }
+  ],
 })
 export class AppModule {}

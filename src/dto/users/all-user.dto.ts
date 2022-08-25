@@ -19,7 +19,7 @@ export class AllUserDto {
   // 学院
   @IsString()
   @IsNotEmpty()
-  @ApiProperty({ description: '学院', example: '计算机科学与工程学院' })
+  @ApiProperty({ description: '学院', example: '计算机科学与工程' })
   college: string;
   // 专业
   @IsString()

@@ -3,7 +3,7 @@ import { User } from '@/entities/users';
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
-
+import { AuthUserDto } from '@/dto/users';
 @Injectable()
 export class AuthService {
   constructor(
@@ -13,12 +13,12 @@ export class AuthService {
   async findOne(studentId: string): Promise<User> {
     return this.userService.findOne(studentId);
   }
-  async validateUser(username: string, pass: string): Promise<any> {
+  async validateUser(username: string, pass: string): Promise<AuthUserDto | null> {
     const user = await this.userService.findOne(username);
     if (user && user.password === pass) {
+      // console.log(user);
       // 过滤数据
       const {
-        id,
         password,
         createdAt,
         deletedAt,
@@ -26,6 +26,13 @@ export class AuthService {
         phoneNumber,
         ...result
       } = user;
+      Object.defineProperty(result, 'roles', {
+        value: [result.identity.id],
+        writable: false,
+        configurable: false,
+        enumerable: true,
+      })
+      delete result.identity
       return result;
     }
     return null;
