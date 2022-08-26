@@ -7,16 +7,18 @@ import { IdentityEnum } from '@/enum/identity.enum';
 import { Role } from '@/enum/roles';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Connection, Repository } from 'typeorm';
 import { UserService } from '../user/user.service';
 @Injectable()
 export class RecruitmentService {
   constructor(
     @InjectRepository(Recruitment)
     private readonly recruitmentRepository: Repository<Recruitment>,
-    private readonly userService: UserService
+    private readonly userService: UserService,
+    private readonly connection: Connection,
   ) {}
 
+  // 检查个人信息是否完善
   private checkUserInfo(user: User): string {
     const {
       id,
@@ -33,9 +35,23 @@ export class RecruitmentService {
     }
     return '';
   }
-  async findOne(authUserDto: AuthUserDto): Promise<Result<AllRecruitmentDto>> {
+
+  // 当前是否已经结束
+  async isEnd() {
+    const item = await this.connection
+      .getRepository(Recruitment)
+      .createQueryBuilder('recruitment')
+      .select('recruitment.isEnd')
+      .orderBy('recruitment.id', 'DESC')
+      .getOne();
+    
+    return item.isEnd;
+  }
+
+  // 通过user.id 查询出用户的申请表
+  async findOne(id: number): Promise<Result<AllRecruitmentDto>> {
     const data = await this.recruitmentRepository.findOne({
-      where: { user: authUserDto.id },
+      where: { user: id },
       relations: ['user']
     });
     if (!data) {
@@ -60,19 +76,20 @@ export class RecruitmentService {
     return { code: 0, message: '', data: res };
   }
 
+  // 通过user.id 更新用户的申请表
   async updateUserApplication(
-    authUserDto: AuthUserDto,
+    id: number, // user.id
     updateRecruitmentDto: UpdateRecruitmentDto,
   ) {
     // 获取用户, 检查用户基础信息是否填写完整
-    const user = await this.userService.findOne(authUserDto.studentId);
+    const user = await this.userService.findOne(id);
     const checkUserInfoError = this.checkUserInfo(user);
     if (checkUserInfoError !== '') {
       return { code: -4, message: checkUserInfoError };
     }
 
     // 获取申请表中记录
-    const item = await this.findOne(authUserDto);
+    const item = await this.findOne(id);
 
     let recruitmentItem: Recruitment;
     if (item.code === 0) {
@@ -85,7 +102,6 @@ export class RecruitmentService {
       if (!recruitmentItem) return { code: -1, message: '更新错误' };
     } else {
       // 表中无记录，需要新建
-      
       recruitmentItem = this.recruitmentRepository.create({
         user,
         ...updateRecruitmentDto,
@@ -99,11 +115,11 @@ export class RecruitmentService {
       return { code: -2, message: err }
     }
   }
-
-  async sureApplocation(authUserDto: AuthUserDto): Promise<Result<string>> {
-    const item = await this.findOne(authUserDto);
+  // 会员确定申请表后点击提交
+  async sureApplocation(id: number): Promise<Result<string>> {
+    const item = await this.findOne(id);
     
-    if (!item) return { code: -1, message: '当前用户尚未填表' };
+    if (item.code === -1) return { code: -1, message: '当前用户尚未填表' };
     
     const { data } = item;
     if (data.isDeliver) return { code: -2, message: '当前用户已提交' };
@@ -122,12 +138,9 @@ export class RecruitmentService {
       return { code: -4, message: err };
     }
   }
-  /**
-   * roles 实际上只有一个
-   */
+
+  // 通过role检查用户身份
   private getIdentityByRole(role: number) {
-    // 会员
-    if (role === Role.member) return IdentityEnum.MEMBER;
     // 理事会
     if ([Role.LSH_CWFHZ, Role.LSH_HZ, Role.LSH_JSFHZ, Role.LSH_ZGFZR].includes(role)) {
       return IdentityEnum.LSH;
@@ -152,26 +165,29 @@ export class RecruitmentService {
     if ([Role.MSC_FMS, Role.MSC_MSZ].includes(role)) {
       return IdentityEnum.SECRETARIAT;
     }
-    throw new TypeError(`用户权限非法`)
+    // 会员
+    // if (role === Role.member) return IdentityEnum.MEMBER;
+    throw new TypeError(`用户权限非法，干事和会员无法获取干事申请表`)
   }
 
+  // 根据用户身份获取所有用户表
   async getAllRecruitment(
-    roles: Role[],
+    id: number, // user.id
     pages: number,
     pageSize: number,
     department: string,
   ): Promise<Result<Recruitment>> {
-    const role = roles[0];
+    const user = await this.userService.findOne(id);
+    if (!user) return { code: -4, message: '非法访问' };
+
+    const role = user.identity.id;
     let userIdentity: IdentityEnum;
     try {
       userIdentity = this.getIdentityByRole(role);
     } catch (err) {
-      return { code: -1, message: err };
+      return { code: -1, message: '干事不可查看或当前用户非法', data: err };
     }
-    
-    if (userIdentity === IdentityEnum.MEMBER) {
-      return { code: -2, message: '当前用户是会员，无法获取对应申请表' };
-    }
+
     let data: any
     if (userIdentity === IdentityEnum.LSH) {
       let where: any = null;
@@ -202,5 +218,35 @@ export class RecruitmentService {
       message: `pages is ${pages}, page_size is ${pageSize}`,
       data
     };
+  }
+
+  // 结束收集干事申请表
+  async endCollectionTbale(): Promise<Result<string>> {
+    try {
+      await this.recruitmentRepository
+        .createQueryBuilder('recruitment')
+        .update(Recruitment)
+        .set({ isEnd: true })
+        .execute();
+
+      return { code: 0, message: '结束收集' };
+    } catch (err) {
+      return { code: -1, message: err };
+    }
+  }
+
+  // 开始收集干事申请表
+  async startCollectionTbale(): Promise<Result<string>> {
+    try {
+      await this.recruitmentRepository
+        .createQueryBuilder('recruitment')
+        .update(Recruitment)
+        .set({ isEnd: false })
+        .execute();
+
+      return { code: 0, message: '开始收集' };
+    } catch (err) {
+      return { code: -1, message: err };
+    }
   }
 }

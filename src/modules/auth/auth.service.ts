@@ -11,34 +11,21 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
   async findOne(studentId: string): Promise<User> {
-    return this.userService.findOne(studentId);
+    return this.userService.findOneByStudentId(studentId);
   }
   async validateUser(username: string, pass: string): Promise<AuthUserDto | null> {
-    const user = await this.userService.findOne(username);
+    const user = await this.userService.findOneByStudentId(username);
     if (user && user.password === pass) {
-      // console.log(user);
-      // 过滤数据
-      const {
-        password,
-        createdAt,
-        deletedAt,
-        updatedAt,
-        phoneNumber,
-        ...result
-      } = user;
-      Object.defineProperty(result, 'roles', {
-        value: [result.identity.id],
-        writable: false,
-        configurable: false,
-        enumerable: true,
-      })
-      delete result.identity
+      const result = {
+        id: user.id
+      }
       return result;
     }
     return null;
   }
 
   login(user: getUserInfoDto): string {
+    console.log(user);
     return this.jwtService.sign(user);
   }
 }

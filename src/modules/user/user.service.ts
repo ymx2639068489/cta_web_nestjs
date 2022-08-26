@@ -15,7 +15,14 @@ export class UserService {
     private readonly userIdentityRepository: Repository<UserIdentity>,
     private readonly connection: Connection,
   ) {}
-  async findOne(studentId: string): Promise<User> {
+  async findOne(id: number): Promise<User> {
+    // return this.users.find((user) => user.username === username);
+    return this.userRepository.findOne({
+      where: { id },
+      relations: ['identity']
+    });
+  }
+  async findOneByStudentId(studentId: string): Promise<User> {
     // return this.users.find((user) => user.username === username);
     return this.userRepository.findOne({
       where: { studentId },
@@ -27,7 +34,7 @@ export class UserService {
     createUserDto: CreateUserDto,
   ): Promise<Result<string>> {
     const { studentId } = createUserDto;
-    const _1 = await this.userRepository.findOne({ where: { studentId }});
+    const _1 = await this.findOneByStudentId(studentId);
     if (_1) return { code: -1, message: '注册失败，用户已经注册过了' };
     try {
       // 获取会员身份
@@ -36,7 +43,6 @@ export class UserService {
         ...createUserDto,
         identity
       })
-      // console.log(item);
       await this.userRepository.save(item);
       return { code: 0, message: '注册成功' };
     } catch (err) {
@@ -70,26 +76,25 @@ export class UserService {
   }
 
   async update(
-    studentId: string,
+    id: number,
     updateUserDto: UpdateUserDto
   ): Promise<Result<string>> {
-    const user = await this.findOne(studentId);
+    const user = await this.findOne(id);
     if (!user) {
       return {
         code: -2,
-        message: `student with studentId ${studentId} not found, 当前用户状态错误`
+        message: `student with studentId not found, 当前用户状态错误`
       };
     }
 
     const updateUser = await this.userRepository.preload({
       id: user.id,
-      ...updateUserDto,
-      studentId // 学号和id不能变
+      ...updateUserDto
     })
     if (!updateUser) {
       return {
         code: -2,
-        message: `student with studentId ${studentId} not found, 当前用户状态错误`
+        message: `student with studentId not found, 当前用户尚未注册`
       };
     }
     try {
@@ -99,4 +104,35 @@ export class UserService {
       return { code: -2, message: err };
     }
   }
+
+  async updateByStudentId(
+    studentId: string,
+    updateUserDto: UpdateUserDto,
+  ): Promise<Result<string>> {
+    const user = await this.findOneByStudentId(studentId);
+    if (!user) {
+      return {
+        code: -2,
+        message: `student with studentId not found, 当前用户尚未注册`
+      };
+    }
+
+    const updateUser = await this.userRepository.preload({
+      id: user.id,
+      ...updateUserDto
+    })
+    if (!updateUser) {
+      return {
+        code: -2,
+        message: `student with studentId not found, 当前用户状态错误`
+      };
+    }
+    try {
+      await this.userRepository.save(updateUser);
+      return { code: 0, message: '修改成功' };
+    } catch (err) {
+      return { code: -2, message: err };
+    }
+  }
+
 }

@@ -9,10 +9,9 @@ import { AdminRole, Role } from '@/enum/roles';
 import { Body, Controller, Get, Patch, Post, Query, Request, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { RecruitmentService } from './recruitment.service';
-// import { Role } from '@/enum/roles'
-// import { Roles } from '@/common/decorators/Role/roles.decorator';
-@ApiBearerAuth()
+
 @UseGuards(JwtAuthGuard)
+@ApiBearerAuth()
 @ApiTags('recruitment')
 @Controller('recruitment')
 export class RecruitmentController {
@@ -21,7 +20,7 @@ export class RecruitmentController {
   @Get('getUserApplication')
   @ApiResponse({ type: warpResponse({ type: AllRecruitmentDto })})
   async getUserApplication(@Request() { user }: any): Promise<Result<AllRecruitmentDto>> {
-    return await this.recruitmentService.findOne(user);
+    return await this.recruitmentService.findOne(user.id);
   }
 
   @Post('updateApplicationForm')
@@ -30,13 +29,20 @@ export class RecruitmentController {
     @Request() { user }: any,
     @Body() updateRecruitmentDto: UpdateRecruitmentDto
   ) {
-    return await this.recruitmentService.updateUserApplication(user, updateRecruitmentDto);
+    if (await this.recruitmentService.isEnd()) {
+      return { code: -10, message: '截止报名' }
+    }
+    return await this.recruitmentService.updateUserApplication(user.id, updateRecruitmentDto);
   }
 
   @Patch('sureApplocation')
+  @Roles(Role.member)
   @ApiResponse({ type: warpResponse({ type: 'string' })})
   async sureApplication(@Request() { user }: any): Promise<Result<string>> {
-    return await this.recruitmentService.sureApplocation(user);
+    if (await this.recruitmentService.isEnd()) {
+      return { code: -10, message: '截止报名' }
+    }
+    return await this.recruitmentService.sureApplocation(user.id);
   }
 
   @Get('GetAllRecruitment')
@@ -51,11 +57,33 @@ export class RecruitmentController {
     @Query('pageSize') pageSize: string,
     @Query('department') department: string,
   ): Promise<Result<Recruitment>> {
+    if (await this.recruitmentService.isEnd()) {
+      return { code: -10, message: '截止报名' }
+    }
     return await this.recruitmentService.getAllRecruitment(
-      user.roles,
+      user.id,
       +pages,
       +pageSize,
       department,
     );
+  }
+
+  
+  @Get('endCollectionTbale')
+  @Roles(Role.LSH_HZ, Role.LSH_CWFHZ)
+  @ApiResponse({ type: warpResponse({ type: 'string' }) })
+  async endCollectionTbale(
+    @Request() { user }: any,
+  ): Promise<Result<string>> {
+    return await this.recruitmentService.endCollectionTbale();
+  }
+
+  @Get('startCollectionTbale')
+  @Roles(Role.LSH_HZ, Role.LSH_CWFHZ)
+  @ApiResponse({ type: warpResponse({ type: 'string' }) })
+  async startCollectionTbale(
+    @Request() { user }: any,
+  ): Promise<Result<string>> {
+    return await this.recruitmentService.startCollectionTbale();
   }
 }

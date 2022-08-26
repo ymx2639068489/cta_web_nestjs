@@ -33,8 +33,9 @@ export class UserController {
   @Get('getUserInfo')
   @ApiBearerAuth()
   @ApiResponse({ type: warpResponse({ type: getUserInfoDto }) })
-  getProfile(@Request() req: any) {
-    return { code: 0, message: '获取成功', data: req.user };
+  async getProfile(@Request() req: any) {
+    const data = await this.userService.findOne(req.user.id)
+    return { code: 0, message: '获取成功', data };
   }
 
   @Post('register')
@@ -48,10 +49,10 @@ export class UserController {
   @ApiBearerAuth()
   @ApiResponse({ type: warpResponse({ type: 'string' }) })
   async update(
-    @Request() req: any,
+    @Request() { user }: any,
     @Body() updateUserDto: UpdateUserDto,
   ): Promise<Result<string>> {
-    return await this.userService.update(req.user.studentId, updateUserDto);
+    return await this.userService.update(user.id, updateUserDto);
   }
 
   @Get('sendVerificationCode')
@@ -63,8 +64,8 @@ export class UserController {
     @Query('qq') qq: string,
     @Query('studentId') studentId: string,
   ): Promise<Result<string>> {
-    const user = await this.userService.findOne(studentId);
-    if (!user || user.qq !== qq) return { code: -4, message: '用户不存在，请先注册' };
+    const user = await this.userService.findOneByStudentId(studentId);
+    if (!user || user.qq !== qq) return { code: -4, message: '用户不存在或未完善个人信息' };
     return await this.emailService.sendEmailCode({
       email: qq + '@qq.com',
       subject: '用户邮箱验证',
@@ -81,8 +82,7 @@ export class UserController {
     if (!f) {
       return { code: -1, message: '验证码错误' };
     }
-
     const { code, ...result } = forgotPasswordDto;
-    return await this.userService.update(forgotPasswordDto.studentId, result)
+    return await this.userService.updateByStudentId(forgotPasswordDto.studentId, result)
   }
 }

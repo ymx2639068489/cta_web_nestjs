@@ -3,15 +3,7 @@ import { IsNotEmpty, IsNumber } from "class-validator";
 import { AllUserDto } from "./all-user.dto";
 import { CreateUserIdentityDto } from "./user-identity.dto";
 
-class temp extends PickType(AllUserDto, [
-  'studentId',
-  'qq',
-  'college',
-  'major',
-  'class',
-  'username',
-  'avatarUrl',
-]) {
+class temp {
   iat?: any;
   exp?: any;
   // id
@@ -19,7 +11,5 @@ class temp extends PickType(AllUserDto, [
   @IsNotEmpty()
   @ApiProperty({ description: 'id', example: '6' })
   id: number;
-  @ApiProperty({ description: '社团身份', example: [20]})
-  roles: number[];
 }
 export class AuthUserDto extends PartialType(temp) {}

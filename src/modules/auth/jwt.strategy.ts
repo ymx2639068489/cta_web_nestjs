@@ -4,10 +4,13 @@ import { Injectable } from '@nestjs/common';
 import { jwtConstants } from './constants';
 import { getUserInfoDto } from '@/dto/users';
 import { AuthUserDto } from '@/dto/users/AuthUser.dto';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor() {
+  constructor(
+    private readonly userService: UserService
+  ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
@@ -17,7 +20,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   async validate(payload: AuthUserDto): Promise<AuthUserDto> {
     // 除了iat 和 exp， 其他的数据都是auth.service.login中过滤的数据
-    const { iat, exp, ...res } = payload;
+    const { id } = payload;
+    const res = await this.userService.findOne(id)
     return res;
   }
 }
