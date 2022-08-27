@@ -1,8 +1,9 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { BaseEntity } from '../base.entity';
 import { User } from '../users';
 
-@Entity()
-export class Gxa {
+@Entity('GxaApplicationForm')
+export class GxaApplicationForm extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -10,7 +11,7 @@ export class Gxa {
   @Column({ type: 'int', default: new Date().getFullYear() })
   session: number;
   // 作品名称
-  @Column()
+  @Column({ nullable: true })
   workName: string;
 
   // 小队名字
@@ -18,7 +19,7 @@ export class Gxa {
   teamName: string;
 
   // 组别, false -> 静态, true -> 动态
-  @Column({ type: 'bool', default: false})
+  @Column({ type: 'bool', default: false })
   group: boolean;
 
   // 队长 / 负责人
@@ -27,19 +28,22 @@ export class Gxa {
   leader: User;
 
   // 队员一
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, {nullable: true })
   @JoinColumn()
   teamMumber1: User;
   
   // 队员二
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, {nullable: true })
   @JoinColumn()
   teamMumber2: User;
 
   // 参赛团队学生特长
-  @Column({ type: 'longtext' })
+  @Column({ type: 'longtext', nullable: true })
   teamMumberSpecialty: string;
   // 作品简介
-  @Column({ type: 'longtext' })
+  @Column({ type: 'longtext', nullable: true })
   introductionToWorks: string;
+  // 分配端口号
+  @Column({ type: 'int', nullable: true })
+  portNumber: number;
 }

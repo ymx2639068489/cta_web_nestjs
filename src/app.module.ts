@@ -12,6 +12,8 @@ import { EmailModule } from './modules/email/email.module';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './common/guard/jwt.guard';
 import { TasksModule } from './tasks/tasks.module';
+import { GxaModule } from './modules/gxa/gxa.module';
+import { MessageModule } from './modules/message/message.module';
 
 @Module({
   imports: [
@@ -35,6 +37,8 @@ import { TasksModule } from './tasks/tasks.module';
     AuthModule,
     EmailModule,
     TasksModule,
+    GxaModule,
+    MessageModule,
   ],
   controllers: [UserController],
   providers: [

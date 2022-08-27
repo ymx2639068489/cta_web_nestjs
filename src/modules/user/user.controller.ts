@@ -9,6 +9,7 @@ import { getUserInfoDto } from '@/dto/users';
 import { EmailService } from '../email/email.service';
 import { ForgotPasswordDto } from '@/dto/users';
 import { NoAuth } from '@/common/decorators/Role/customize';
+import { User } from '@/entities/users';
 
 @ApiTags('users')
 @Controller('users')
@@ -33,8 +34,9 @@ export class UserController {
   @Get('getUserInfo')
   @ApiBearerAuth()
   @ApiResponse({ type: warpResponse({ type: getUserInfoDto }) })
-  async getProfile(@Request() req: any) {
+  async getProfile(@Request() req: any): Promise<Result<User>> {
     const data = await this.userService.findOne(req.user.id)
+    delete data.password
     return { code: 0, message: '获取成功', data };
   }
 
@@ -42,6 +44,8 @@ export class UserController {
   @NoAuth(0)
   @ApiResponse({ type: warpResponse({ type: 'string' }) })
   async create(@Body() createUserDto: CreateUserDto): Promise<Result<string>> {
+    const user = await this.userService.findOneByStudentId(createUserDto.studentId)
+    if (user) return { code: -5, message: '用户已被注册' }
     return await this.userService.createUser(createUserDto);
   }
 
@@ -84,5 +88,28 @@ export class UserController {
     }
     const { code, ...result } = forgotPasswordDto;
     return await this.userService.updateByStudentId(forgotPasswordDto.studentId, result)
+  }
+
+
+  @Get('findOne')
+  @ApiBearerAuth()
+  @ApiQuery({ name: 'studentId' })
+  @ApiResponse({ type: warpResponse({ type: User })})
+  async findOne(@Query('studentId') studentId: 'string'): Promise<Result<any>> {
+    // return studentId;
+    const user = await this.userService.findOneByStudentId(studentId)
+    // return 
+    if (!user) {
+      return { code: -1, message: `studentId: ${studentId} not fount`}
+    }
+    const data = {
+      username: user.username,
+      studentId: user.studentId,
+      avatarUrl: user.avatarUrl,
+      college: user.college,
+      major: user.major,
+      class: user.class
+    }
+    return { code: 0, message: '', data }
   }
 }

@@ -57,13 +57,13 @@ async function bootstrap() {
   );
 
   // app.use(new HttpRequestMiddleware().use)
-  await app.listen(3002);
+  await app.listen(3001);
 }
 
 bootstrap();
 /**
  * 3001 is development
- * 3004 is process
+ * 3002 is process
  * class-validator class-transformer // 参数转换和验证
  * @nestjs/typeorm typeorm 0.2.x mysql // 实体类型orm
  * @nestjs/config // 配置文件

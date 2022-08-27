@@ -16,15 +16,38 @@ export class UserService {
     private readonly connection: Connection,
   ) {}
   async findOne(id: number): Promise<User> {
-    // return this.users.find((user) => user.username === username);
     return this.userRepository.findOne({
+      select: [
+        'id',
+        'studentId',
+        'username',
+        'college',
+        'major',
+        'class',
+        'qq',
+        'phoneNumber',
+        'avatarUrl',
+        'identity'
+      ],
       where: { id },
       relations: ['identity']
     });
   }
   async findOneByStudentId(studentId: string): Promise<User> {
-    // return this.users.find((user) => user.username === username);
     return this.userRepository.findOne({
+      select: [
+        'id',
+        'studentId',
+        'username',
+        'college',
+        'major',
+        'class',
+        'qq',
+        'password',
+        'phoneNumber',
+        'avatarUrl',
+        'identity'
+      ],
       where: { studentId },
       relations: ['identity']
     });

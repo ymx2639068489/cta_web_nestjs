@@ -1,6 +1,6 @@
 import { User } from "@/entities/users";
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { IsBoolean, IsNotEmpty, IsNumber, IsString } from "class-validator";
 
 export class GxaDto {
   @IsNumber()
@@ -15,17 +15,17 @@ export class GxaDto {
 
   @IsString()
   @IsNotEmpty()
-  @ApiProperty({ description: '作品名称' })
+  @ApiProperty({ description: '作品名称', default: '国信安作品名' })
   workName: string;
 
   @IsString()
   @IsNotEmpty()
-  @ApiProperty({ description: '队伍名称' })
+  @ApiProperty({ description: '队伍名称', default: '国信安一队' })
   teamName: string;
 
-  @IsString()
+  @IsBoolean()
   @IsNotEmpty()
-  @ApiProperty({ description: '参赛组别 false->静态, true->动态' })
+  @ApiProperty({ description: '参赛组别 false->静态, true->动态', default: false })
   group: boolean;
 
   @IsNotEmpty()

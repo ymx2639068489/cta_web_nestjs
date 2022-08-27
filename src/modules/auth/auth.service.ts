@@ -25,7 +25,6 @@ export class AuthService {
   }
 
   login(user: getUserInfoDto): string {
-    console.log(user);
     return this.jwtService.sign(user);
   }
 }
