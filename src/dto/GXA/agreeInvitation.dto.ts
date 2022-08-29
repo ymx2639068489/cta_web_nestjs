@@ -1,5 +1,4 @@
-import { AllMessageDto } from '../message'
-import { ApiProperty, IntersectionType, PartialType, PickType } from '@nestjs/swagger';
+import { ApiProperty, PartialType } from '@nestjs/swagger';
 class temp{
   @ApiProperty({ description: '消息id' })
   id: number;

@@ -10,6 +10,7 @@ import { ApiPropertyOptions } from '@nestjs/swagger/dist/decorators/api-property
 import { map, Observable } from 'rxjs';
 import { CommonResponse } from './transform.interceptor';
 import { Logger } from '../utils/log4js/index';
+import { desensitizationFn } from '../utils/desensitization';
 /**
  * 所有的拦截器都应该实现从@nestjs/common导出的`NestInterceptor`接口
  */
@@ -18,16 +19,9 @@ export class WrapResponseInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const req = context.getArgByIndex(1).req;
     Logger.log(`收到请求 ---> ${req.route.path}`);
-    // const req = context.switchToHttp().getRequest();
-    // // get hreaders and body
-    // const headers_key = Reflect.ownKeys(req).filter(
-    //   (key) => key.toString() === 'Symbol(kHeaders)',
-    // )[0];
-    // const headers = req[headers_key]; // headers
-    // const body = req.body; // body
-    // console.log(req);
     return next.handle().pipe(
       map((data) => {
+        data = desensitizationFn(data)
         if (data?.response?.statusCode) {
           Logger.fatal(`响应失败fatal ---> ${req.route.path}`);
           return {

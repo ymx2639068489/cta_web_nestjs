@@ -1,8 +1,8 @@
 import { Controller, Post, Body, UseGuards, Get, Request, Patch, Param, Put, Query } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto, UpdateUserDto, UserLoginDto } from '@/dto/users';
+import { AllUserDto, CreateUserDto, UpdateUserDto, UserLoginDto } from '@/dto/users';
 import { Result } from '@/common/interface/result';
-import { ApiBearerAuth, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { warpResponse } from '@/common/interceptors';
 import { AuthService } from '../auth/auth.service';
 import { getUserInfoDto } from '@/dto/users';
@@ -23,6 +23,7 @@ export class UserController {
   @Post('login')
   @NoAuth(-1)
   @ApiResponse({ type: warpResponse({ type: 'string' }) })
+  @ApiOperation({ description: '用户登录' })
   async userLogin(
     @Request() req: any,
     @Body() _userLoginDto: UserLoginDto
@@ -33,6 +34,7 @@ export class UserController {
 
   @Get('getUserInfo')
   @ApiBearerAuth()
+  @ApiOperation({ description: '获取用户信息' })
   @ApiResponse({ type: warpResponse({ type: getUserInfoDto }) })
   async getProfile(@Request() req: any): Promise<Result<User>> {
     const data = await this.userService.findOne(req.user.id)
@@ -42,6 +44,7 @@ export class UserController {
 
   @Post('register')
   @NoAuth(0)
+  @ApiOperation({ description: '用户注册' })
   @ApiResponse({ type: warpResponse({ type: 'string' }) })
   async create(@Body() createUserDto: CreateUserDto): Promise<Result<string>> {
     const user = await this.userService.findOneByStudentId(createUserDto.studentId)
@@ -51,6 +54,7 @@ export class UserController {
 
   @Put('updateUserInfo')
   @ApiBearerAuth()
+  @ApiOperation({ description: '更新用户信息' })
   @ApiResponse({ type: warpResponse({ type: 'string' }) })
   async update(
     @Request() { user }: any,
@@ -61,6 +65,7 @@ export class UserController {
 
   @Get('sendVerificationCode')
   @NoAuth(0)
+  @ApiOperation({ description: '忘记密码时、发送邮箱验证码' })
   @ApiResponse({ type: warpResponse({ type: 'string' }) })
   @ApiQuery({ name: 'qq', required: true })
   @ApiQuery({ name: 'studentId', required: true })
@@ -78,6 +83,7 @@ export class UserController {
 
   @Patch('updateUserPassword')
   @NoAuth(0)
+  @ApiOperation({ description: '用户忘记密码时、同一调用此接口（邮箱验证）' })
   @ApiResponse({ type: warpResponse({ type: 'string' }) })
   async forgotPassword(
     @Body() forgotPasswordDto: ForgotPasswordDto
@@ -94,7 +100,8 @@ export class UserController {
   @Get('findOne')
   @ApiBearerAuth()
   @ApiQuery({ name: 'studentId' })
-  @ApiResponse({ type: warpResponse({ type: User })})
+  @ApiOperation({ description: '查找一个用户，' })
+  @ApiResponse({ type: warpResponse({ type: AllUserDto })})
   async findOne(@Query('studentId') studentId: 'string'): Promise<Result<any>> {
     // return studentId;
     const user = await this.userService.findOneByStudentId(studentId)

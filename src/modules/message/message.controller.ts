@@ -1,9 +1,10 @@
 import { warpResponse } from '@/common/interceptors';
-import { Controller, Get, Query, Req } from '@nestjs/common';
-import { ApiBearerAuth, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Controller, Delete, Get, Param, Patch, Query, Req } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Message } from '@/entities/message';
 import { AllMessageDto } from '@/dto/message';
 import { MessageService } from './message.service';
+import { Result } from '@/common/interface/result';
 @ApiTags('messsage')
 @ApiBearerAuth()
 @Controller('message')
@@ -14,6 +15,7 @@ export class MessageController {
   @Get()
   @ApiQuery({ name: 'pages' })
   @ApiQuery({ name: 'pageSize' })
+  @ApiOperation({ description: '获取用户的所有消息，按照创建时间降序排序' })
   @ApiResponse({ type: warpResponse({ type: AllMessageDto }) })
   async getUserMessage(
     @Req() { user }: any,
@@ -21,5 +23,17 @@ export class MessageController {
     @Query('pageSize') pageSize: string,
   ) {
     return await this.messageService.find(user, +pages, +pageSize);
+  }
+  @Delete(':id')
+  @ApiOperation({ description: '通过id删除消息'})
+  @ApiResponse({ type: warpResponse({ type: 'string' }) })
+  async delete(@Req() { user }: any, @Param('id') id: string): Promise<Result<string>> {
+    return await this.messageService.delete(user, +id)
+  }
+  @Patch(':id')
+  @ApiOperation({ description: '已读消息'})
+  @ApiResponse({ type: warpResponse({ type: 'string' }) })
+  async readMessage(@Req() { user }: any, @Param('id') id: string): Promise<Result<string>> {
+    return await this.messageService.readMessage(user, +id)
   }
 }

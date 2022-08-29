@@ -13,7 +13,7 @@ export class GxaWork extends BaseEntity {
   gxaApplicationForm: GxaApplicationForm;
 
   // 首页展示图片地址
-  @Column()
+  @Column({ default: 'https://ts1.cn.mm.bing.net/th?id=OIP-C.wc_dCG_KbIKZwMdtD3gL2QHaEt&w=313&h=199&c=8&rs=1&qlt=90&o=6&dpr=1.1&pid=3.1&rm=2'})
   showImg: string;
 
   // 网站简介

@@ -1,7 +1,7 @@
-import { User } from "@/entities/users";
+// import { User } from "@/entities/users";
 import { ApiProperty } from "@nestjs/swagger";
 import { IsBoolean, IsNotEmpty, IsNumber, IsString } from "class-validator";
-
+import { UserDto } from "../users";
 export class GxaDto {
   @IsNumber()
   @IsNotEmpty()
@@ -30,13 +30,13 @@ export class GxaDto {
 
   @IsNotEmpty()
   @ApiProperty({ description: '队长' })
-  leader: User;
+  leader: UserDto;
 
   @ApiProperty({ description: '队员1' })
-  teamMumber1: User;
+  teamMumber1: UserDto;
 
   @ApiProperty({ description: '队员2' })
-  teamMumber2: User;
+  teamMumber2: UserDto;
 
   @IsString()
   @IsNotEmpty()

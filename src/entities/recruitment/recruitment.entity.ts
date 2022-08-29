@@ -13,7 +13,7 @@ export class Recruitment extends BaseEntity {
   user: User;
 
   // 存照
-  @Column({ nullable: true, comment: '存照' })
+  @Column({ comment: '存照', default: 'https://tse1-mm.cn.bing.net/th/id/OIP-C.hHDS2Mkvhk7utwBzpG8RCwAAAA?w=209&h=209&c=7&r=0&o=5&dpr=1.1&pid=1.7' })
   inchPhoto: string;
 
   // 第一志愿
@@ -39,8 +39,4 @@ export class Recruitment extends BaseEntity {
   // 是否已经投递
   @Column({ type: 'bool', default: false })
   isDeliver: boolean;
-
-  // 是否已经截止
-  @Column({ type: 'bool', default: false })
-  isEnd: boolean;
 }

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsString } from 'class-validator';
 export class AllUserDto {
   // 姓名
   @IsString()
@@ -11,6 +11,12 @@ export class AllUserDto {
   @IsNotEmpty()
   @ApiProperty({ description: '+学号', example: '20101010110' })
   studentId: string;
+
+  // 性别
+  @IsBoolean()
+  @IsNotEmpty()
+  @ApiProperty({ description: '性别true -> 女 false -> 男', example: false })
+  gender: boolean;
   // 密码
   @IsString()
   @IsNotEmpty()

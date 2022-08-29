@@ -25,4 +25,7 @@ export class Message extends BaseEntity {
 
   @Column()
   callback: string;
+
+  @Column({ type: 'bool', default: false })
+  isRead: boolean;
 }

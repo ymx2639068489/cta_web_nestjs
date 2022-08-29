@@ -6,3 +6,4 @@ export * from './create-user.dto';
 export * from './getUserInfo.dto';
 export * from './forgotPassword.dto';
 export * from './AuthUser.dto';
+export * from './user.dto';

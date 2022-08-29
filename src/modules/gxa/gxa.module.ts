@@ -5,10 +5,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { GxaApplicationForm, GxaWork } from '@/entities/GXA';
 import { MessageModule } from '../message/message.module';
 import { UserModule } from '../user/user.module';
+import { ActiveTimeModule } from '../active-time/active-time.module';
 @Module({
   imports: [
     UserModule,
     MessageModule,
+    ActiveTimeModule,
     TypeOrmModule.forFeature([
       GxaApplicationForm,
       GxaWork

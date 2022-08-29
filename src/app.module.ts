@@ -14,7 +14,8 @@ import { JwtAuthGuard } from './common/guard/jwt.guard';
 import { TasksModule } from './tasks/tasks.module';
 import { GxaModule } from './modules/gxa/gxa.module';
 import { MessageModule } from './modules/message/message.module';
-
+import { ActiveTimeModule } from './modules/active-time/active-time.module';
+import * as redisStore from 'cache-manager-redis-store';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -39,6 +40,7 @@ import { MessageModule } from './modules/message/message.module';
     TasksModule,
     GxaModule,
     MessageModule,
+    ActiveTimeModule,
   ],
   controllers: [UserController],
   providers: [

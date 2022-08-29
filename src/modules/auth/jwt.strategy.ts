@@ -2,7 +2,6 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable } from '@nestjs/common';
 import { jwtConstants } from './constants';
-import { getUserInfoDto } from '@/dto/users';
 import { AuthUserDto } from '@/dto/users/AuthUser.dto';
 import { UserService } from '../user/user.service';
 

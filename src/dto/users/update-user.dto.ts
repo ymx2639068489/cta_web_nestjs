@@ -7,7 +7,8 @@ class updateUser extends PickType(AllUserDto, [
   'class',
   'qq',
   'phoneNumber',
-  'avatarUrl'
+  'avatarUrl',
+  'gender'
 ]) {}
 
 export class UpdateUserDto extends PartialType(updateUser) {}

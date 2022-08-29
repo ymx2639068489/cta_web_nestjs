@@ -28,12 +28,12 @@ export class GxaApplicationForm extends BaseEntity {
   leader: User;
 
   // 队员一
-  @ManyToOne(() => User, {nullable: true })
+  @ManyToOne(() => User, { nullable: true })
   @JoinColumn()
   teamMumber1: User;
   
   // 队员二
-  @ManyToOne(() => User, {nullable: true })
+  @ManyToOne(() => User, { nullable: true })
   @JoinColumn()
   teamMumber2: User;
 
@@ -46,4 +46,7 @@ export class GxaApplicationForm extends BaseEntity {
   // 分配端口号
   @Column({ type: 'int', nullable: true })
   portNumber: number;
+  // 是否报名
+  @Column({ type: 'bool', default: false })
+  isDeliver: boolean;
 }

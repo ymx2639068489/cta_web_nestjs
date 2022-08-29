@@ -1,18 +1,17 @@
-import { User } from '@/entities/users';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsBoolean, IsNotEmpty, IsString } from 'class-validator';
-
+import { UserDto } from '../users';
 export class AllMessageDto {
   @ApiProperty()
   id: number;
 
   @IsNotEmpty()
   @ApiProperty({ description: '谁发的'})
-  from: User;
+  from: UserDto;
 
   @IsNotEmpty()
   @ApiProperty({ description: '发给谁'})
-  to: User;
+  to: UserDto;
 
   @IsString()
   @IsNotEmpty()
@@ -21,13 +20,18 @@ export class AllMessageDto {
 
   @IsBoolean()
   @IsNotEmpty()
-  @ApiProperty()
+  @ApiProperty({ description: '是否需要确定' })
   isNeedToConfirm: boolean;
 
-  @ApiProperty()
+  @IsBoolean()
+  @ApiProperty({ description: '是否已经确定' })
   isConfirm: boolean;
   
   @IsString()
-  @ApiProperty()
+  @ApiProperty({ description: '确定后需要的回调函数'})
   callback: string;
+
+  @IsBoolean()
+  @ApiProperty({ description: '是否已读' })
+  isRead: boolean;
 }

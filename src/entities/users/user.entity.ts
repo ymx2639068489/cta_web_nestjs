@@ -22,6 +22,16 @@ export class User extends BaseEntity {
     comment: '学号',
   })
   studentId: string;
+
+  // 性别
+  @Column({
+    comment: '性别',
+    type: 'bool',
+    default: false,
+    nullable: false,
+  })
+  gender: boolean;
+
   // 密码
   @Column({
     comment: '密码',

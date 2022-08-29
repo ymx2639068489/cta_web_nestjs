@@ -1,16 +1,12 @@
 import { ApiProperty, PickType } from '@nestjs/swagger';
 import { IsBoolean, IsEnum, IsNotEmpty, IsString } from 'class-validator';
 import { IdentityEnum } from '@/enum/identity.enum';
-import { AllUserDto } from '../users';
+import { UserDto } from '../users';
 
-export class AllRecruitmentDto extends PickType(AllUserDto, [
-  'username',
-  'college',
-  'major',
-  'class',
-  'qq',
-  'phoneNumber',
-]){
+export class AllRecruitmentDto{
+  @ApiProperty()
+  user: UserDto;
+
   @IsNotEmpty()
   @ApiProperty()
   id: number;

@@ -8,8 +8,7 @@ class temp extends PickType(AllRecruitmentDto, [
   'secondChoice',
   'isAdjust',
   'curriculumVitae',
-  'reasonsForElection',
-  'isDeliver'
+  'reasonsForElection'
 ]) {}
 
 export class UpdateRecruitmentDto extends PartialType(temp) {}

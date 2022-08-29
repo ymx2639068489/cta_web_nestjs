@@ -13,7 +13,9 @@ import {
   // 响应包装拦截器
   WrapResponseInterceptor,
 } from './common/interceptors';
-
+import * as csurf from 'csurf';
+import { rateLimit } from 'express-rate-limit';
+import helmet from 'helmet';
 async function bootstrap() {
   const appConfig = {
     cors: true,
@@ -55,9 +57,19 @@ async function bootstrap() {
     new WrapResponseInterceptor(),
     new TimeoutInterceptor(),
   );
-
+  // 限速
+  app.use(
+    rateLimit({
+      windowMs: 60 * 1000, // 15 minutes
+      max: 2000, // limit each IP to 100 requests per windowMs
+    }),
+  )
+  // csrf保护
+  // app.use(csurf());
+  // Helmet 可以帮助保护应用免受一些众所周知的 Web 漏洞的影响
+  app.use(helmet());
   // app.use(new HttpRequestMiddleware().use)
-  await app.listen(3001);
+  await app.listen(3002);
 }
 
 bootstrap();
