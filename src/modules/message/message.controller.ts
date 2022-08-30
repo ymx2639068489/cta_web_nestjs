@@ -1,7 +1,6 @@
 import { warpResponse } from '@/common/interceptors';
 import { Controller, Delete, Get, Param, Patch, Query, Req } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { Message } from '@/entities/message';
 import { AllMessageDto } from '@/dto/message';
 import { MessageService } from './message.service';
 import { Result } from '@/common/interface/result';
@@ -35,5 +34,12 @@ export class MessageController {
   @ApiResponse({ type: warpResponse({ type: 'string' }) })
   async readMessage(@Req() { user }: any, @Param('id') id: string): Promise<Result<string>> {
     return await this.messageService.readMessage(user, +id)
+  }
+
+  @Get('notRead')
+  @ApiOperation({ description: '获取未读消息' })
+  @ApiResponse({ type: warpResponse({ type: 'number' }) })
+  async getTotalNumberOfUnreadMessage(@Req() { user }: any) {
+    return await this.messageService.getTotalNumberOfUnreadMessage(user);
   }
 }

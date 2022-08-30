@@ -4,10 +4,13 @@ import { Recruitment } from '@/entities/recruitment';
 import { User } from '@/entities/users';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Connection, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { UserService } from '../user/user.service';
 import * as path from 'path';
 import { ActiveTimeService } from '../active-time/active-time.service';
+import { MessageService } from '../message/message.service';
+import { UserDto } from '@/dto/users';
+import { EmailService } from '../email/email.service';
 @Injectable()
 export class RecruitmentService {
   private readonly staticBasePath: string = path.join(__dirname, '../../../static');
@@ -15,8 +18,9 @@ export class RecruitmentService {
     @InjectRepository(Recruitment)
     private readonly recruitmentRepository: Repository<Recruitment>,
     private readonly userService: UserService,
-    private readonly connection: Connection,
-    private readonly activeTimeService: ActiveTimeService
+    private readonly activeTimeService: ActiveTimeService,
+    private readonly messageService: MessageService,
+    private readonly emailService: EmailService
   ) {}
 
   // 检查个人信息是否完善
@@ -30,7 +34,7 @@ export class RecruitmentService {
       ...items
     } = user;
     for (const key in items) {
-      if (!items[key]) {
+      if (items[key] === null) {
         return `your ${key} is null, please complete your personal information`;
       }
     }
@@ -61,6 +65,7 @@ export class RecruitmentService {
   ) {
     // 获取用户, 检查用户基础信息是否填写完整
     const user = await this.userService.findOne(id);
+    // console.log(user);
     const checkUserInfoError = this.checkUserInfo(user);
     if (checkUserInfoError !== '') {
       return { code: -4, message: checkUserInfoError };
@@ -97,7 +102,7 @@ export class RecruitmentService {
     }
   }
 
-  // // 通过role检查用户身份
+  // 通过role检查用户身份
   // private getIdentityByRole(role: number) {
   //   // 理事会
   //   if ([Role.LSH_CWFHZ, Role.LSH_HZ, Role.LSH_JSFHZ, Role.LSH_ZGFZR].includes(role)) {
@@ -178,6 +183,10 @@ export class RecruitmentService {
   //   };
   // }
 
+
+  
+  
+
   // 会员确定申请表后点击提交
   async sureApplocation(id: number): Promise<Result<string>> {
     const item = await this.findOne(id);
@@ -187,15 +196,31 @@ export class RecruitmentService {
     const { data } = item;
     if (data.isDeliver) return { code: -2, message: '当前用户已提交' };
 
-    const applocation = await this.recruitmentRepository.preload({
-      id: data.id,
-      isDeliver: true
-    })
-
-    if (!applocation) return { code: -3, message: '更新失败' };
-
     try {
-      await this.recruitmentRepository.save(applocation);
+      const application = await this.recruitmentRepository.preload({
+        id: data.id,
+        isDeliver: true
+      })
+
+      if (!application) return { code: -3, message: '更新失败' };
+
+      await this.recruitmentRepository.save(application);
+      await this.emailService.sendRecuritmentEmail({
+        qq: data.user.qq,
+        username: data.user.username
+      })
+      const content = `
+        Hi，${data.user.username}
+          感谢你对计算机技术协会的关注！我们已经收到你的申请表并会认真评估你的干事申请表。
+          通过初步评估后，我们会及时发送消息以及发送邮箱通知你进行后续的操作。
+      `
+      await this.messageService.createOfficialMessage({
+        to:<UserDto>data.user,
+        isNeedToConfirm: false,
+        callback: '',
+        content,
+      })
+      
       return { code: 0, message: '提交成功' };
     } catch (err) {
       return { code: -4, message: err };

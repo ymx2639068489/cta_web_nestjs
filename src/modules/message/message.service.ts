@@ -6,6 +6,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserService } from '../user/user.service';
+
 @Injectable()
 export class MessageService {
   private official: User;
@@ -129,4 +130,17 @@ export class MessageService {
       return { code: -2, message: err };
     }
   }
+
+
+  async getTotalNumberOfUnreadMessage(user: User) {
+    const number = await this.messageRepository.findAndCount({
+      where: {
+        to: user,
+        isRead: false
+      }
+    })
+    if (!number) return { code: 0, message: '', data: 0 }
+    return { code: 0, message: '', data: number[number.length - 1] };
+  }
+
 }

@@ -13,7 +13,6 @@ export class UserService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(UserIdentity)
     private readonly userIdentityRepository: Repository<UserIdentity>,
-    private readonly connection: Connection,
   ) {}
   async findOne(id: number): Promise<User> {
     return this.userRepository.findOne({

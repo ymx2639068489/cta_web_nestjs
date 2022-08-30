@@ -11,13 +11,13 @@ import * as path from 'path';
         host: 'smtp.qq.com',
         port: 465,
         auth: {
-          user: '2639068489@qq.com',
-          pass: 'ryqicumkapkaecgf'
+          user: '3491357178@qq.com',
+          pass: 'xmnngyfxkkumcihf'
         }
       },
       preview: false,
       defaults: {
-        from: '测试邮件 <2639068489@qq.com>'
+        from: '四川轻化工大学计算机技术协会 <3491357178@qq.com>'
       },
       template: {
         dir: path.join(process.cwd(), './src/modules/email/template'),

@@ -1,17 +1,10 @@
-import { Roles } from '@/common/decorators/Role/roles.decorator';
 import { JwtAuthGuard } from '@/common/guard';
 import { warpResponse } from '@/common/interceptors';
 import { Result } from '@/common/interface/result';
 import { AllRecruitmentDto, UpdateRecruitmentDto } from '@/dto/recruitment';
-import { Recruitment } from '@/entities/recruitment';
-import { IdentityEnum } from '@/enum/identity.enum';
-import { AdminRole, Role } from '@/enum/roles';
-import { Body, Controller, Get, Header, Patch, Post, Query, Req, Request, Res, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Patch, Post, Request, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { RecruitmentService } from './recruitment.service';
-import { Response } from 'express';
-import { CreateFileDto } from '@/dto/common/file.dto';
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 @ApiTags('recruitment')

@@ -19,13 +19,13 @@ import {
   Put
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { GxaService } from './gxa.service';
+import { GxaApplicationService } from './gxa_application.service';
 
 @ApiBearerAuth()
-@ApiTags('gxa')
-@Controller('gxa')
-export class GxaController {
-  constructor(private readonly gxaService: GxaService) {}
+@ApiTags('gxa_application')
+@Controller('gxa_application')
+export class GxaApplicationController {
+  constructor(private readonly gxaService: GxaApplicationService) {}
 
   @Post('createApplicationForm')
   @ApiOperation({ description: '第一次创建报名表，只用填写队伍名就可以了' })

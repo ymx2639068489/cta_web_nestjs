@@ -75,10 +75,7 @@ export class UserController {
   ): Promise<Result<string>> {
     const user = await this.userService.findOneByStudentId(studentId);
     if (!user || user.qq !== qq) return { code: -4, message: '用户不存在或未完善个人信息' };
-    return await this.emailService.sendEmailCode({
-      email: qq + '@qq.com',
-      subject: '用户邮箱验证',
-    });
+    return await this.emailService.sendverifyEmailCode({ qq });
   }
 
   @Patch('updateUserPassword')

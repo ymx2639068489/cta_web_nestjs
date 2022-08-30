@@ -2,7 +2,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { IsNotEmpty, IsNumber, IsString } from "class-validator";
 import { GxaDto } from "./allGxa.dto";
 
-export class GxaWorkDto {
+export class AllGxaWorkDto {
   @IsNumber()
   @ApiProperty({ description: 'id' })
   id: number;
@@ -24,4 +24,9 @@ export class GxaWorkDto {
   @IsNotEmpty()
   @ApiProperty({ description: '网站地址' })
   websiteUrl: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({ description: '网站代码github地址' })
+  githubUrl: string;
 }

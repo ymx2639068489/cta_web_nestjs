@@ -16,14 +16,16 @@ import { UserService } from '../user/user.service';
 import { desensitizationFn } from '@/common/utils/desensitization'
 import { ActiveTimeService } from '../active-time/active-time.service';
 import { Result } from '@/common/interface/result';
+import { EmailService } from '../email/email.service';
 @Injectable()
-export class GxaService {
+export class GxaApplicationService {
   constructor(
     @InjectRepository(GxaApplicationForm)
     private readonly gxaApplicationFormRepository: Repository<GxaApplicationForm>,
     private readonly messageService: MessageService,
     private readonly userService: UserService,
-    private readonly activeTimeService: ActiveTimeService
+    private readonly activeTimeService: ActiveTimeService,
+    private readonly emailService: EmailService,
   ) {}
 
   // 报名是否截止
@@ -99,8 +101,8 @@ export class GxaService {
       relations: ['leader', 'teamMumber1', 'teamMumber2']
     });
     if (!application) return { code: -1, message: '请先创建队伍' };
-    console.log(application, user);
-    
+    // console.log(application, user);
+    if (application.isDeliver) return { code: -5, message: '当前队伍已经报名，需要修改请取消报名' };
     if (application.leader.studentId === studentId) return { code: -4, message: '不能自己拉自己' };
     if ([
         application.teamMumber1?.studentId,
@@ -115,7 +117,7 @@ export class GxaService {
         to: <UserDto>to,
         content: `${user.username} 的国信安团队>${application.teamName}<正在邀请您加入对方团队一起参加比赛，是否同意？`,
         isNeedToConfirm: true,
-        callback: '/api/gxa/agreeInvitation'
+        callback: 'agreeGxaInvitation'
       });
       return { code: 0, message: '邀请成功，等待队友确定' };
     } catch (err) {
@@ -152,6 +154,8 @@ export class GxaService {
       },
       relations: ['leader','teamMumber1', 'teamMumber2']
     })
+    if (!_application) return { code: -6, message: '对方队伍已被解散或不存在' };
+    if (_application.isDeliver) return { code: -7, message: '对方队伍已经报名' };
     // 如果对方队伍满了
     if (_application.teamMumber1 && _application.teamMumber2) {
       return { code: -4, message: '对方队伍已满' };
@@ -202,6 +206,7 @@ export class GxaService {
   async delete(user: User): Promise<Result<string>> {
     const application = await this.findOneByLeader(user);
     if (!application) return { code: -2, message: '当前用户尚未创建队伍' };
+    if (application.isDeliver) return { code: -3, message: '当前队伍已经报名，需要修改请取消报名' };
     const content = `小队${application.teamName}的队长：${application.leader.username}解散了该队伍。`
     try {
       await getManager().transaction(async transactionalEntityManager => {
@@ -240,6 +245,7 @@ export class GxaService {
     const application = await this.findOneByUser(user);
     // 如果没有报名表
     if (!application) return { code: -2, message: '当前用户尚未加入任何' };
+    if (application.isDeliver) return { code: -3, message: '当前队伍已经报名，需要修改请取消报名' };
     // 如果是队长
     if (application.leader?.id === user?.id) return { code: -3, message: '队长不能退出队伍，只能解散' }
     // 否则是队员
@@ -278,7 +284,7 @@ export class GxaService {
     const application = await this.findOneByLeader(user);
     if (!application) return { code: -1, message: '当前用户没有组队或不是队长，请队长提交报名表' };
 
-    if (!application.isDeliver) return { code: -2, message: '已经提供过了，请勿重复提交' };
+    if (!application.isDeliver) return { code: -2, message: '当前队伍尚未提交' };
 
     try {
       const item = await this.gxaApplicationFormRepository.preload({
@@ -286,7 +292,7 @@ export class GxaService {
         isDeliver: false,
       });
       await this.gxaApplicationFormRepository.save(item);
-      return { code: 0, message: '提交成功' };
+      return { code: 0, message: '取消提交成功' };
     } catch (err) {
       return { code: -3, message: err };
     }
@@ -320,6 +326,10 @@ export class GxaService {
             ))
           }
         }
+        await this.emailService.sendSubmitGxaApplicationEmail({
+          qq: item.leader.qq,
+          teamName: item.teamName,
+        })
       })
       return { code: 0, message: '提交成功' };
     } catch (err) {
@@ -336,6 +346,7 @@ export class GxaService {
     if (!application) {
       return { code: -1, message: '当前用户没有组织队伍或不是队长' };
     }
+    if (application.isDeliver) return { code: -3, message: '当前队伍已经报名，需要修改请取消报名' };
     let item: any;
     try {
       if (application.teamMumber1?.studentId === kickedUserStudentId) {
@@ -374,6 +385,7 @@ export class GxaService {
   ): Promise<Result<string>>  {
     const _application = await this.findOneByLeader(leader)
     if (!_application) return { code: -1, message: '用户尚未组织队伍,请联系队长更改信息' };
+    if (_application.isDeliver) return { code: -3, message: '当前队伍已经报名，需要修改请取消报名' };
     try {
       await this.gxaApplicationFormRepository.save(
         await this.gxaApplicationFormRepository.preload({

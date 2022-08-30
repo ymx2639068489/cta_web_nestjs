@@ -1,21 +1,23 @@
-import { Module, CacheModule } from '@nestjs/common';
-import { UserModule } from './modules/user/user.module';
-import { RecruitmentModule } from './modules/recruitment/recruitment.module';
+import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import appConfig from './config/app.config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CommonModule } from './common/common.module';
-import { AuthModule } from './modules/auth/auth.module';
 import { UserController } from './modules/user/user.controller';
-import { _CommonModule } from './modules/common/common.module';
-import { EmailModule } from './modules/email/email.module';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './common/guard/jwt.guard';
 import { TasksModule } from './tasks/tasks.module';
-import { GxaModule } from './modules/gxa/gxa.module';
-import { MessageModule } from './modules/message/message.module';
-import { ActiveTimeModule } from './modules/active-time/active-time.module';
-import * as redisStore from 'cache-manager-redis-store';
+import {
+  GxaWorksModule,
+  ActiveTimeModule,
+  MessageModule,
+  GxaApplicationModule,
+  EmailModule,
+  _CommonModule,
+  AuthModule,
+  UserModule,
+  RecruitmentModule
+} from './modules';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -31,16 +33,17 @@ import * as redisStore from 'cache-manager-redis-store';
       autoLoadEntities: true, // 自动加载模块，而不是指定实体数组, 开发环境谨慎使用
       synchronize: true, // 同步数据库，如果不存在则创自动创建, 开发环境谨慎使用
     }),
+    RecruitmentModule,
     CommonModule,
     UserModule,
-    RecruitmentModule,
     _CommonModule,
     AuthModule,
     EmailModule,
     TasksModule,
-    GxaModule,
     MessageModule,
     ActiveTimeModule,
+    GxaApplicationModule,
+    GxaWorksModule,
   ],
   controllers: [UserController],
   providers: [
@@ -48,7 +51,7 @@ import * as redisStore from 'cache-manager-redis-store';
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
-    }
+    },
   ],
 })
 export class AppModule {}

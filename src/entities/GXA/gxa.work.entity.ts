@@ -22,9 +22,16 @@ export class GxaWork extends BaseEntity {
 
   /**
    * 如果此作品是静态，则会分配到一个服务器某一个端口号上
-   * 如果是动态，则会提供一个前台地址。
+   * 如果是动态，则会提供一个前台地址（id + 4w）。
    * 提交作品时，会提交对应的网址，在用户注册时或动态组自行提交
    */
   @Column()
   websiteUrl: string;
+
+  /**
+   * 如果是动态的则需要提交到github/gitee上去，然后将项目地址发给我们
+   * 静态则不需要
+   */
+  @Column({ nullable: true })
+  githubUrl: string;
 }
