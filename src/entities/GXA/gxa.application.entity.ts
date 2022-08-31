@@ -30,12 +30,12 @@ export class GxaApplicationForm extends BaseEntity {
   // 队员一
   @ManyToOne(() => User, { nullable: true })
   @JoinColumn()
-  teamMumber1: User;
+  teamMember1: User;
   
   // 队员二
   @ManyToOne(() => User, { nullable: true })
   @JoinColumn()
-  teamMumber2: User;
+  teamMember2: User;
 
   // 参赛团队学生特长
   @Column({ type: 'longtext', nullable: true })

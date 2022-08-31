@@ -37,7 +37,7 @@ export class GxaApplicationService {
   async findOneByLeader(user: User): Promise<GxaApplicationForm> {
     return await this.gxaApplicationFormRepository.findOne({
       where: { leader: user },
-      relations: ['leader', 'teamMumber1', 'teamMumber2']
+      relations: ['leader', 'teamMember1', 'teamMember2']
     });
   }
 
@@ -58,10 +58,10 @@ export class GxaApplicationService {
     return await this.gxaApplicationFormRepository.findOne({
       where: [
         { leader: user },
-        { teamMumber1: user },
-        { teamMumber2: user }
+        { teamMember1: user },
+        { teamMember2: user }
       ],
-      relations: ['leader', 'teamMumber1', 'teamMumber2']
+      relations: ['leader', 'teamMember1', 'teamMember2']
     })
   }
 
@@ -72,6 +72,7 @@ export class GxaApplicationService {
   ): Promise<Result<string>> {
     // 删除联级查询的信息
     delete user.identity;
+    if (!createApplicationFormDto.teamName) return { code: -9, message: '团队名不能为空' };
     // 先检查用户是否已经注册过了
     const _form = await this.findOneByUser(user);
     if (_form) {
@@ -98,15 +99,15 @@ export class GxaApplicationService {
   ): Promise<Result<string>> {
     const application = await this.gxaApplicationFormRepository.findOne({
       where: { leader: user },
-      relations: ['leader', 'teamMumber1', 'teamMumber2']
+      relations: ['leader', 'teamMember1', 'teamMember2']
     });
     if (!application) return { code: -1, message: '请先创建队伍' };
     // console.log(application, user);
     if (application.isDeliver) return { code: -5, message: '当前队伍已经报名，需要修改请取消报名' };
     if (application.leader.studentId === studentId) return { code: -4, message: '不能自己拉自己' };
     if ([
-        application.teamMumber1?.studentId,
-        application.teamMumber2?.studentId
+        application.teamMember1?.studentId,
+        application.teamMember2?.studentId
       ].includes(studentId)) {
       return { code: -2, message: '对方已在队伍中' };
     }
@@ -152,12 +153,12 @@ export class GxaApplicationService {
       where: {
         leader: agreeInvitationDto.from
       },
-      relations: ['leader','teamMumber1', 'teamMumber2']
+      relations: ['leader','teamMember1', 'teamMember2']
     })
     if (!_application) return { code: -6, message: '对方队伍已被解散或不存在' };
     if (_application.isDeliver) return { code: -7, message: '对方队伍已经报名' };
     // 如果对方队伍满了
-    if (_application.teamMumber1 && _application.teamMumber2) {
+    if (_application.teamMember1 && _application.teamMember2) {
       return { code: -4, message: '对方队伍已满' };
     }
     try {
@@ -183,15 +184,15 @@ export class GxaApplicationService {
         )
         let application: any
         // 如果队友一存在
-        if (_application.teamMumber1) {
+        if (_application.teamMember1) {
           application = await this.gxaApplicationFormRepository.preload({
             ..._application,
-            teamMumber2: user
+            teamMember2: user
           })
         } else {
           application = await this.gxaApplicationFormRepository.preload({
             ..._application,
-            teamMumber1: user,
+            teamMember1: user,
           })
         }
         await manager.save(GxaApplicationForm, application)
@@ -210,22 +211,22 @@ export class GxaApplicationService {
     const content = `小队${application.teamName}的队长：${application.leader.username}解散了该队伍。`
     try {
       await getManager().transaction(async transactionalEntityManager => {
-        if (application.teamMumber1) {
+        if (application.teamMember1) {
           await transactionalEntityManager.save(
             Message,
             this.messageService.createOfficialMessageTransaction({
-              to: <UserDto>application.teamMumber1,
+              to: <UserDto>application.teamMember1,
               content,
               isNeedToConfirm: false,
               callback: '',
             }
           ))
         }
-        if (application.teamMumber2) {
+        if (application.teamMember2) {
           await transactionalEntityManager.save(
             Message,
             this.messageService.createOfficialMessageTransaction({
-              to: <UserDto>application.teamMumber2,
+              to: <UserDto>application.teamMember2,
               content,
               isNeedToConfirm: false,
               callback: '',
@@ -251,18 +252,18 @@ export class GxaApplicationService {
     // 否则是队员
     try {
       let preload: any;
-      console.log(application.teamMumber1, user);
+      console.log(application.teamMember1, user);
       
-      if (application.teamMumber1?.id === user?.id) {
+      if (application.teamMember1?.id === user?.id) {
         
         preload = await this.gxaApplicationFormRepository.preload({
           ...application,
-          teamMumber1: null
+          teamMember1: null
         })
-      } else if (application.teamMumber2?.id === user?.id) {
+      } else if (application.teamMember2?.id === user?.id) {
         preload = await this.gxaApplicationFormRepository.preload({
           ...application,
-          teamMumber2: null
+          teamMember2: null
         })
       }
       if (!preload) return { code: -4, message: '当前用户未参加任何队伍' };
@@ -313,7 +314,7 @@ export class GxaApplicationService {
           portNumber: application.id + 40000,
         })
         await manager.save(GxaApplicationForm, item)
-        for (const key of ['leader', 'teamMumber1', 'teamMumber2']) {
+        for (const key of ['leader', 'teamMember1', 'teamMember2']) {
           if (item[key]) {
             await manager.save(
               Message,
@@ -349,15 +350,15 @@ export class GxaApplicationService {
     if (application.isDeliver) return { code: -3, message: '当前队伍已经报名，需要修改请取消报名' };
     let item: any;
     try {
-      if (application.teamMumber1?.studentId === kickedUserStudentId) {
+      if (application.teamMember1?.studentId === kickedUserStudentId) {
         item = await this.gxaApplicationFormRepository.preload({
           ...application,
-          teamMumber1: null,
+          teamMember1: null,
         });
-      } else if (application.teamMumber2?.studentId === kickedUserStudentId) {
+      } else if (application.teamMember2?.studentId === kickedUserStudentId) {
         item = await this.gxaApplicationFormRepository.preload({
           ...application,
-          teamMumber2: null,
+          teamMember2: null,
         });
       } else {
         return { code: -2, message: '对方不在你的队伍中' };

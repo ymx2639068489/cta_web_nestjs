@@ -33,15 +33,15 @@ export class GxaDto {
   leader: UserDto;
 
   @ApiProperty({ description: '队员1' })
-  teamMumber1: UserDto;
+  teamMember1: UserDto;
 
   @ApiProperty({ description: '队员2' })
-  teamMumber2: UserDto;
+  teamMember2: UserDto;
 
   @IsString()
   @IsNotEmpty()
   @ApiProperty({ description: '队伍成员特长' })
-  teamMumberSpecialty: string;
+  teamMemberSpecialty: string;
 
   @IsString()
   @IsNotEmpty()

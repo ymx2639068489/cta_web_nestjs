@@ -1,12 +1,18 @@
+import { SubmitGxaWorkDto } from '@/dto/GXA';
 import { GxaWork } from '@/entities/GXA';
+import { User } from '@/entities/users';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import * as path from 'path';
+import * as fs from 'fs';
+import * as StreamZip from 'node-stream-zip';
 import { Repository } from 'typeorm';
 import { ActiveTimeService } from '../active-time/active-time.service';
 import { GxaApplicationService } from '../gxa_application/gxa_application.service';
 
 @Injectable()
 export class GxaWorksService {
+  private readonly GxaWorksBasePath: string = path.join(__dirname, '../../../GXA_WORKS');
   constructor(
     @InjectRepository(GxaWork)
     private readonly gxaWorkRepository: Repository<GxaWork>,
@@ -16,5 +22,145 @@ export class GxaWorksService {
   
   async isActive() {
     return await this.activeTimeService.isActive('GXA_works')
+  }
+
+  async submitWord(
+    user: User,
+    submitGxaWorkDto: SubmitGxaWorkDto,
+  ) {
+    const application = await this.gxaApplicationService.findOneByLeader(user);
+    console.log(application);
+    
+    if (!application || !application.isDeliver) return { code: -1, message: '用户没有提交报名表' };
+    if (application.group) {
+      if (!submitGxaWorkDto.githubUrl || !submitGxaWorkDto.websiteUrl) {
+        return { code: -3, message: '请填写网站部署地址以及github地址' };
+      }
+    } else {
+      delete submitGxaWorkDto.githubUrl;
+      delete submitGxaWorkDto.websiteUrl;
+    }
+    const _item = await this.gxaWorkRepository.findOne({
+      where: { gxaApplicationForm: application }
+    })
+    let item: any;
+    // console.log(application);
+
+    if (!_item) {
+      if (!application.group) {
+        item = this.gxaWorkRepository.create({
+          gxaApplicationForm: application,
+          websiteUrl: `http://yumingxi.xyz:${application.portNumber}`,
+          ...submitGxaWorkDto,
+        });
+      } else {
+        item = this.gxaWorkRepository.create({
+          gxaApplicationForm: application,
+          ...submitGxaWorkDto,
+        });
+      }
+    } else {
+      item = await this.gxaWorkRepository.preload({
+        id: _item.id,
+        ...submitGxaWorkDto,
+        gxaApplicationForm: application,
+      })
+    }
+    try {
+      await this.gxaWorkRepository.save(item);
+      return { code: 0, message: '信息提交成功, 请继续上传文件, 动态组可无视' };
+    } catch (err) {
+      return { code: -2, message: err };
+    }
+  }
+
+  async getGxaWorkInfo(user: User) {
+    const application = await this.gxaApplicationService.findOneByLeader(user);
+    if (!application || !application.isDeliver) return { code: -1, message: '用户没有提交报名表' };
+    const _item = await this.gxaWorkRepository.findOne({
+      where: { gxaApplicationForm: application }
+    })
+    // if ()
+    if (_item) return { code: 0, message: '', data: _item };
+    return { code: -2, message: '用户当前未提交' };
+  }
+  
+  async uploadFile(user: User, file: Express.Multer.File) {
+    // 创建好文件夹, 之前的数据全删了
+    await this.mkdir(user);
+    const application = await this.gxaApplicationService.findOneByLeader(user)
+    if (!application || !application.isDeliver) return { code: -1, message: '用户没有提交报名表' };
+    // 用户文件夹
+    const userPath = `${this.GxaWorksBasePath}/${application.id}`
+    
+    // 保存zip文件到文件夹下面
+    fs.writeFileSync(`${userPath}/code.zip`, file.buffer);
+    const zip = new StreamZip({
+      file: `${userPath}/code.zip`,
+      storeEntries: true
+    });
+    zip.on('ready', () => {
+      zip.extract(null, `${userPath}/website`, (err: any, count) => {
+        console.log(err ? 'Extract error' : `Extracted ${count} entries`);
+          zip.close();
+      });
+    });
+    zip.on('error', err => {
+      console.log(err);
+    });
+  }
+
+  async mkdir(user: User) {
+    const application = await this.gxaApplicationService.findOneByLeader(user)
+    if (!application || !application.isDeliver) return { code: -1, message: '用户没有提交报名表' };
+    // 基础路径
+    const userPath = `${this.GxaWorksBasePath}/${application.id}`
+
+    // 用户文件夹
+    try {
+      let item = fs.statSync(userPath)
+      if (!(item && item.isDirectory)) {
+        fs.unlinkSync(userPath)
+        fs.mkdirSync(userPath);
+      }
+    } catch {
+      fs.mkdirSync(userPath);
+    }
+    // 把website 和code.zip删除掉
+    try {
+      let item = fs.statSync(`${userPath}/website`)
+      if (item.isDirectory()) {
+        this.removeDir(`${userPath}/website`)
+      }
+    } catch {}
+    try {
+      let item = fs.statSync(`${userPath}/code.zip`)
+      if (item.isFile()) fs.unlinkSync(`${userPath}/code.zip`)
+    } catch {}
+    // 重新新建用户文件夹下面的website
+    try {
+      let item = fs.statSync(`${userPath}/website`)
+      if (!(item && item.isDirectory)) {
+        fs.unlinkSync(`${userPath}/website`)
+        fs.mkdirSync(`${userPath}/website`);
+      }
+    } catch {
+      fs.mkdirSync(`${userPath}/website`)
+    }
+  }
+  async removeDir(dir: any) {
+    let files = fs.readdirSync(dir)
+    for(var i = 0; i < files.length; i ++ ) {
+      let newPath = path.join(dir,files[i]);
+      let stat = fs.statSync(newPath)
+      if(stat.isDirectory()){
+        //如果是文件夹就递归下去
+        this.removeDir(newPath);
+      }else {
+       //删除文件
+        fs.unlinkSync(newPath);
+      }
+    }
+    fs.rmdirSync(dir) //如果文件夹是空的，就将自己删除掉
   }
 }

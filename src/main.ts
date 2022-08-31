@@ -55,7 +55,7 @@ async function bootstrap() {
   // 全局拦截器
   app.useGlobalInterceptors(
     new WrapResponseInterceptor(),
-    new TimeoutInterceptor(),
+    // new TimeoutInterceptor(),
   );
   // 限速
   app.use(
@@ -69,7 +69,7 @@ async function bootstrap() {
   // Helmet 可以帮助保护应用免受一些众所周知的 Web 漏洞的影响
   app.use(helmet());
   // app.use(new HttpRequestMiddleware().use)
-  await app.listen(3001);
+  await app.listen(3002);
 }
 
 bootstrap();
