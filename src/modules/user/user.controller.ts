@@ -11,6 +11,7 @@ import { ForgotPasswordDto } from '@/dto/users';
 import { NoAuth } from '@/common/decorators/Role/customize';
 import { User } from '@/entities/users';
 
+@ApiBearerAuth()
 @ApiTags('users')
 @Controller('users')
 export class UserController {
@@ -33,7 +34,6 @@ export class UserController {
   }
 
   @Get('getUserInfo')
-  @ApiBearerAuth()
   @ApiOperation({ description: '获取用户信息' })
   @ApiResponse({ type: warpResponse({ type: getUserInfoDto }) })
   async getProfile(@Request() req: any): Promise<Result<User>> {
@@ -44,7 +44,7 @@ export class UserController {
 
   @Post('register')
   @NoAuth(0)
-  @ApiOperation({ description: '用户注册' })
+  @ApiOperation({ description: '用户注册, public' })
   @ApiResponse({ type: warpResponse({ type: 'string' }) })
   async create(@Body() createUserDto: CreateUserDto): Promise<Result<string>> {
     const user = await this.userService.findOneByStudentId(createUserDto.studentId)
@@ -53,7 +53,6 @@ export class UserController {
   }
 
   @Put('updateUserInfo')
-  @ApiBearerAuth()
   @ApiOperation({ description: '更新用户信息' })
   @ApiResponse({ type: warpResponse({ type: 'string' }) })
   async update(
@@ -65,7 +64,7 @@ export class UserController {
 
   @Get('sendVerificationCode')
   @NoAuth(0)
-  @ApiOperation({ description: '忘记密码时、发送邮箱验证码' })
+  @ApiOperation({ description: '忘记密码时、发送邮箱验证码, public' })
   @ApiResponse({ type: warpResponse({ type: 'string' }) })
   @ApiQuery({ name: 'qq', required: true })
   @ApiQuery({ name: 'studentId', required: true })
@@ -75,12 +74,13 @@ export class UserController {
   ): Promise<Result<string>> {
     const user = await this.userService.findOneByStudentId(studentId);
     if (!user || user.qq !== qq) return { code: -4, message: '用户不存在或未完善个人信息' };
+
     return await this.emailService.sendverifyEmailCode({ qq });
   }
 
   @Patch('updateUserPassword')
   @NoAuth(0)
-  @ApiOperation({ description: '用户忘记密码时、同一调用此接口（邮箱验证）' })
+  @ApiOperation({ description: '用户忘记密码时、同一调用此接口（邮箱验证）, public' })
   @ApiResponse({ type: warpResponse({ type: 'string' }) })
   async forgotPassword(
     @Body() forgotPasswordDto: ForgotPasswordDto
@@ -95,7 +95,6 @@ export class UserController {
 
 
   @Get('findOne')
-  @ApiBearerAuth()
   @ApiQuery({ name: 'studentId' })
   @ApiOperation({ description: '查找一个用户，' })
   @ApiResponse({ type: warpResponse({ type: AllUserDto })})

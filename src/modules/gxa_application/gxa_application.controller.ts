@@ -139,4 +139,14 @@ export class GxaApplicationController {
     }
     return await this.gxaService.kickOutOfTheTeam(user, kickedUserStudentId)
   }
+
+  @Get('isLeader')
+  @ApiOperation({ description: '判断自己是否为队长' })
+  @ApiResponse({ type: warpResponse({ type: 'boolean' }) })
+  async isLeader(@Req() { user }: any): Promise<Result<boolean>> {
+    if (!await this.gxaService.register_isActive()) {
+      return { code: -10, message: '当前未到报名时间或已结束' };
+    }
+    return this.gxaService.isLeader(user);
+  }
 }

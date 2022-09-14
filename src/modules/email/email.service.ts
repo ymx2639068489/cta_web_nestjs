@@ -7,7 +7,8 @@ import { ForgotPasswordDto } from '@/dto/users';
 import { EmailEnum } from '@/enum/email';
 import {
   SendRecuritmentEmail,
-  SubmitGxaApplicationEmail
+  SubmitGxaApplicationEmail,
+  SubmitGxaWorksEmail
 } from '@/dto/email';
 @Injectable()
 export class EmailService {
@@ -18,7 +19,7 @@ export class EmailService {
   ) {}
   // 不适合做节流的原因：多个用户不方便管理, 会消耗过多内存, 也不方便进行内存管理，不如用cache
   async sendverifyEmailCode(data: any): Promise<Result<string>> {
-    if (!data.email) return { code: -2, message: '请填写email' };
+    if (!data.qq) return { code: -2, message: '请填写qq' };
     // check data.email
     const lastDate = await this.cacheService.get('邮箱验证' + data.email);
     if (lastDate) return { code: -3, message: '请稍后再试' };
@@ -66,6 +67,21 @@ export class EmailService {
         EmailEnum.SubmitGxaApplicationEmail,
         data,
       );
+      console.log(data)
+      await this.mailerService.sendMail(options);
+    } catch (err) {
+      console.error('发送邮件出错:', err);
+      return { code: -1, message: err };
+    }
+  }
+
+  async sendSubmitGxaWorksEmail(data: SubmitGxaWorksEmail) {
+    try {
+      const options = this.getMessageBody(
+        EmailEnum.SubmitGxaWorksEmail,
+        data,
+      );
+      console.log(data)
       await this.mailerService.sendMail(options);
     } catch (err) {
       console.error('发送邮件出错:', err);
@@ -76,14 +92,16 @@ export class EmailService {
   private getMessageBody(type: EmailEnum, data: any): ISendMailOptions {
     switch(type) {
       case EmailEnum.VerifyEmail: {
+        console.log(data);
+        
         return {
-          to: data.qq + '@qq.com',
-          subject: '用户邮箱验证',
+          to: `${data.qq}@qq.com`,
+          subject: '邮箱验证',
           template: 'validate.code.ejs',
           context: {
             code: data.code,
             date: formatDate(new Date()),
-            sign: data.sign || '四川轻化工大学计算机技术协会'
+            sign: '四川轻化工大学计算机技术协会',
           }
         };
       }
@@ -104,12 +122,26 @@ export class EmailService {
       case EmailEnum.AdmissionEmail: {
       }
       case EmailEnum.SubmitGxaApplicationEmail: {
+        console.log(data);
         return {
           to: `${data.qq}@qq.com`,
           subject: '国信安网页设计竞赛报名',
           template: 'gxa-application.code.ejs',
           context: {
             teamName: data.teamName,
+            date: formatDate(new Date()),
+            sign: '四川轻化工大学计算机技术协会',
+          }
+        }
+      }
+      case EmailEnum.SubmitGxaWorksEmail: {
+        return {
+          to: `${data.qq}@qq.com`,
+          subject: '国信安网页设计竞赛提交作品通知',
+          template: 'gxa-works.code.ejs',
+          context: {
+            teamName: data.teamName,
+            url: data.url,
             date: formatDate(new Date()),
             sign: '四川轻化工大学计算机技术协会',
           }

@@ -13,8 +13,8 @@ import {
   // 响应包装拦截器
   WrapResponseInterceptor,
 } from './common/interceptors';
-import * as csurf from 'csurf';
 import { rateLimit } from 'express-rate-limit';
+import { WsAdapter } from './ws/ws.adapter';
 import helmet from 'helmet';
 async function bootstrap() {
   const appConfig = {
@@ -22,10 +22,9 @@ async function bootstrap() {
     abortOnError: false,
   };
   const app = await NestFactory.create(AppModule, appConfig);
-
   app.setGlobalPrefix('api');
+  app.useWebSocketAdapter(new WsAdapter(app));
 
-  // app.useStaticAssets()
   // swagger
   const options = new DocumentBuilder()
     .setTitle('CTA_WEB_API_DOCUMENT')
@@ -69,7 +68,8 @@ async function bootstrap() {
   // Helmet 可以帮助保护应用免受一些众所周知的 Web 漏洞的影响
   app.use(helmet());
   // app.use(new HttpRequestMiddleware().use)
-  await app.listen(3002);
+  await app.listen(3001);
+  console.log(`Application is running on: ${await app.getUrl()}`);
 }
 
 bootstrap();

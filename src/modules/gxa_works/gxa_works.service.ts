@@ -1,5 +1,5 @@
-import { SubmitGxaWorkDto } from '@/dto/GXA';
-import { GxaWork } from '@/entities/GXA';
+import { AllGxaWorkDto, SubmitGxaWorkDto } from '@/dto/GXA';
+import { GxaWork, GxaScore } from '@/entities/GXA';
 import { User } from '@/entities/users';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -9,6 +9,10 @@ import * as StreamZip from 'node-stream-zip';
 import { Repository } from 'typeorm';
 import { ActiveTimeService } from '../active-time/active-time.service';
 import { GxaApplicationService } from '../gxa_application/gxa_application.service';
+import { EmailService } from '../email/email.service';
+import { Api } from '@/common/utils/api';
+import { UserService } from '../user/user.service';
+import { Result } from '@/common/interface/result';
 
 @Injectable()
 export class GxaWorksService {
@@ -16,8 +20,12 @@ export class GxaWorksService {
   constructor(
     @InjectRepository(GxaWork)
     private readonly gxaWorkRepository: Repository<GxaWork>,
+    @InjectRepository(GxaScore)
+    private readonly gxaScoreRepository: Repository<GxaScore>,
     private readonly gxaApplicationService: GxaApplicationService,
     private readonly activeTimeService: ActiveTimeService,
+    private readonly emailService: EmailService,
+    private readonly userService: UserService
   ) {}
   
   async isActive() {
@@ -74,18 +82,18 @@ export class GxaWorksService {
     }
   }
 
-  async getGxaWorkInfo(user: User) {
+  async getGxaWorkInfo(user: User): Promise<Result<AllGxaWorkDto>> {
     const application = await this.gxaApplicationService.findOneByLeader(user);
     if (!application || !application.isDeliver) return { code: -1, message: '用户没有提交报名表' };
     const _item = await this.gxaWorkRepository.findOne({
       where: { gxaApplicationForm: application }
     })
     // if ()
-    if (_item) return { code: 0, message: '', data: _item };
+    if (_item) return { code: 0, message: '', data: <AllGxaWorkDto>_item };
     return { code: -2, message: '用户当前未提交' };
   }
   
-  async uploadFile(user: User, file: Express.Multer.File) {
+  async uploadFile(user: User, file: Express.Multer.File): Promise<Result<string>> {
     // 创建好文件夹, 之前的数据全删了
     await this.mkdir(user);
     const application = await this.gxaApplicationService.findOneByLeader(user)
@@ -99,15 +107,28 @@ export class GxaWorksService {
       file: `${userPath}/code.zip`,
       storeEntries: true
     });
-    zip.on('ready', () => {
-      zip.extract(null, `${userPath}/website`, (err: any, count) => {
-        console.log(err ? 'Extract error' : `Extracted ${count} entries`);
-          zip.close();
+    return new Promise((resolve, reject) => {
+      zip.on('ready', () => {
+        zip.extract(null, `${userPath}/website`, async (err: any, count) => {
+          console.log(err ? 'Extract error' : `Extracted ${count} entries`);
+            zip.close();
+            // await this.emailService
+            for (const item of ['leader', 'teamMember1', 'teamMember2']) {
+              if (application[item]) {
+                await this.emailService.sendSubmitGxaWorksEmail({
+                  qq: application[item].qq,
+                  teamName: application.teamName,
+                  url: `http://yumingxi.xyz:${application.portNumber}/`,
+                })
+              }
+            }
+            resolve({ code: 0, message: '上传成功,静态的请到对应的网址查看网站' })
+        });
       });
-    });
-    zip.on('error', err => {
-      console.log(err);
-    });
+      zip.on('error', err => {
+        reject(err)
+      });
+    })
   }
 
   async mkdir(user: User) {
@@ -162,5 +183,64 @@ export class GxaWorksService {
       }
     }
     fs.rmdirSync(dir) //如果文件夹是空的，就将自己删除掉
+  }
+
+  async getFormulaGxaList() {
+    const _list = await this.gxaWorkRepository.find({
+      relations: ['gxaApplicationForm']
+    });
+    const data = {
+      static: [],
+      dynamic: []
+    }
+    _list.forEach((item: GxaWork) => {
+      const __ = {
+        id: item.id,
+        showImg: item.showImg,
+        websiteUrl: item.websiteUrl,
+        websiteIntroduction: item.websiteIntroduction
+      }      
+      if (item.gxaApplicationForm.group) data.dynamic.push(__)
+      else data.static.push(__)
+    })
+    return Api.ok(data)
+  }
+
+  private async getWorkByStudentId(studentId: string) {
+    const _u = await this.userService.findOneByStudentId(studentId)
+    if (!_u) new Error('未查询到用户');
+    const _a = await this.gxaApplicationService.findOneByUser(_u)
+    if (!_a) new Error('未查询到报名表');
+    const _w = await this.gxaWorkRepository.findOne({
+      where: { gxaApplicationForm: _a }
+    })
+    if (!_w) new Error('未查询到作品');
+    return _w
+  }
+
+  async getTeamIsApprove(studentId: string): Promise<Result<boolean>> {
+    try {
+      const _ = await this.getWorkByStudentId(studentId)
+      return { code: 0, message: '查询成功', data: _.isApproved };
+    } catch (err) {
+      return { code: -1, message: err.message };
+    }
+  }
+
+  async getTeamScore(studentId: string) {
+    try {
+      const _ = await this.getWorkByStudentId(studentId)
+      const score = JSON.parse((await this.gxaScoreRepository.findOne({
+        select: ['score'],
+        where: { work: _ }
+      })).score)
+      const data: number[] = []
+      for (const key in score) {
+        data.push(score[key].reduce((pre: number, curt: number) => pre + curt, 0))
+      }
+      return { code: 0, message: '获取成功', data };
+    } catch (err) {
+      return { code: -1, message: err.message };
+    }
   }
 }

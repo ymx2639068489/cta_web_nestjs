@@ -1,17 +1,24 @@
+import { SwaggerOk } from '@/common/decorators';
+import { NoAuth } from '@/common/decorators/Role/customize';
 import { warpResponse } from '@/common/interceptors';
 import { Result } from '@/common/interface/result';
 import { CreateFileDto } from '@/dto/common/file.dto';
-import { AllGxaWorkDto, SubmitGxaWorkDto } from '@/dto/GXA';
-import { Body, Controller, Get, Post, Req, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { AllGxaWorkDto, GetAllGxaWorkDto, SubmitGxaWorkDto } from '@/dto/GXA';
+import { Body, Controller, Get, Param, Post, Req, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ActiveTimeService } from '../active-time/active-time.service';
 import { GxaWorksService } from './gxa_works.service';
+import { activeName } from '@/enum/active-time';
 
 @ApiBearerAuth()
 @ApiTags('gxa_works')
 @Controller('gxa_works')
 export class GxaWorksController {
-  constructor(private readonly gxaWorkService: GxaWorksService) {}
+  constructor(
+    private readonly gxaWorkService: GxaWorksService,
+    private readonly activeService: ActiveTimeService
+  ) {}
 
   @Post('submit')
   @ApiOperation({ description: '提交作品_除压缩包以外的数据' })
@@ -19,7 +26,7 @@ export class GxaWorksController {
   async submitWord(
     @Req() { user }: any,
     @Body() submitGxaWorkDto: SubmitGxaWorkDto
-  ) {
+  ): Promise<Result<string>> {
     if (!await this.gxaWorkService.isActive()) {
       return { code: -1, message: '当前未在活动时间范围内' }
     }
@@ -29,7 +36,7 @@ export class GxaWorksController {
   @Get()
   @ApiOperation({ description: '获取之前提交的作品信息_除压缩包以外的数据' })
   @ApiResponse({ type: warpResponse({ type: AllGxaWorkDto }) })
-  async getGxaWorkInfo(@Req() { user }: any) {
+  async getGxaWorkInfo(@Req() { user }: any): Promise<Result<AllGxaWorkDto>> {
     if (!await this.gxaWorkService.isActive()) {
       return { code: -1, message: '当前未在活动时间范围内' }
     }
@@ -52,10 +59,40 @@ export class GxaWorksController {
   async uploadFile(
     @Req() { user }: any,
     @UploadedFile() file: Express.Multer.File
-  ) {
+  ): Promise<Result<string>> {
     if (!await this.gxaWorkService.isActive()) {
       return { code: -1, message: '当前未在活动时间范围内' }
     }
     return await this.gxaWorkService.uploadFile(user, file);
+  }
+
+  @Get('getFormulaGxaList')
+  @NoAuth(0)
+  @ApiOperation({ description: '获取公示列表, public' })
+  @SwaggerOk(GetAllGxaWorkDto)
+  async getFormulaGxaList(): Promise<Result<GetAllGxaWorkDto>> {
+    if (!await this.activeService.isActive(activeName.GXA_works_scoring)) {
+      return { code: -1, message: '当前未到公式期' };
+    }
+    return await this.gxaWorkService.getFormulaGxaList()
+  }
+
+  @Get('getTeamIsApprove/:studentId')
+  @ApiParam({ name: 'studentId' })
+  @ApiOperation({ description: '查询自己的作品是否初审成功' })
+  @SwaggerOk()
+  async getTeamIsApprove(@Param('studentId') studentId: string): Promise<Result<boolean>> {
+    if (!await this.activeService.isActive(activeName.GXA_approve)) {
+      return { code: -1, message: '当前未到审核期' };
+    }
+    return await this.gxaWorkService.getTeamIsApprove(studentId)
+  }
+
+  @Get('getTeamScore/:studentId')
+  @ApiParam({ name: 'studentId'})
+  @ApiOperation({ description: '获取评委老师给自己打的分' })
+  @SwaggerOk()
+  async getTeamScore(@Param('studentId') studentId: string): Promise<Result<number[]>> {
+    return this.gxaWorkService.getTeamScore(studentId)
   }
 }

@@ -16,8 +16,10 @@ import {
   _CommonModule,
   AuthModule,
   UserModule,
-  RecruitmentModule
+  RecruitmentModule,
+  EventsModule
 } from './modules';
+import { JournalismModule } from './modules/journalism/journalism.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -44,6 +46,8 @@ import {
     ActiveTimeModule,
     GxaApplicationModule,
     GxaWorksModule,
+    JournalismModule,
+    EventsModule,
   ],
   controllers: [UserController],
   providers: [

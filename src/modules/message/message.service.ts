@@ -40,6 +40,16 @@ export class MessageService {
     return { code: 0, message: '', data };
   }
 
+  async findAllByFromAndTo(from: User, to: User) {
+    return await this.messageRepository.find({
+      where: { to, from },
+      relations: ['from', 'to'],
+      order: {
+        createdAt: 'DESC',
+      },
+    })
+  }
+
   async findOneByIdAndUser(
     user: User,
     id: number,

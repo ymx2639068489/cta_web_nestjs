@@ -14,3 +14,8 @@ export class SubmitGxaApplicationEmail {
   qq: string;
   teamName: string;
 }
+export class SubmitGxaWorksEmail {
+  qq: string;
+  teamName: string;
+  url: string;
+}

@@ -47,4 +47,8 @@ export class GxaDto {
   @IsNotEmpty()
   @ApiProperty({ description: '作品简介' })
   introductionToWorks: string;
+
+  @IsBoolean()
+  @ApiProperty({ description: '是否提交' })
+  isDeliver: boolean;
 }

@@ -10,6 +10,7 @@ export class GxaApplicationForm extends BaseEntity {
   // 第几届
   @Column({ type: 'int', default: new Date().getFullYear() })
   session: number;
+
   // 作品名称
   @Column({ nullable: true })
   workName: string;
@@ -39,7 +40,7 @@ export class GxaApplicationForm extends BaseEntity {
 
   // 参赛团队学生特长
   @Column({ type: 'longtext', nullable: true })
-  teamMumberSpecialty: string;
+  teamMemberSpecialty: string;
   // 作品简介
   @Column({ type: 'longtext', nullable: true })
   introductionToWorks: string;

@@ -28,6 +28,13 @@ export class GxaApplicationService {
     private readonly emailService: EmailService,
   ) {}
 
+  // 当前用户是否为队长
+  async isLeader(user: User) {
+    const application = await this.findOneByLeader(user);
+    if (application) return { code: 0, message: '', data: true }
+    return { code: 0, message: '', data: false }
+  }
+
   // 报名是否截止
   async register_isActive(): Promise<boolean> {
     return await this.activeTimeService.isActive('GXA_register')
@@ -102,7 +109,6 @@ export class GxaApplicationService {
       relations: ['leader', 'teamMember1', 'teamMember2']
     });
     if (!application) return { code: -1, message: '请先创建队伍' };
-    // console.log(application, user);
     if (application.isDeliver) return { code: -5, message: '当前队伍已经报名，需要修改请取消报名' };
     if (application.leader.studentId === studentId) return { code: -4, message: '不能自己拉自己' };
     if ([
@@ -111,7 +117,27 @@ export class GxaApplicationService {
       ].includes(studentId)) {
       return { code: -2, message: '对方已在队伍中' };
     }
+
     const to = await this.userService.findOneByStudentId(studentId);
+
+    // 判断有没有一直重复发
+    // const list = await this.messageService.findAllByFromAndTo(user, to)
+    // if (list) {
+    //   try {
+    //     list.forEach((item) => {
+    //       if (
+    //         item.content.includes('正在邀请您加入对方团队一起参加比赛')
+    //         && !item.isConfirm
+    //       ) {
+    //         throw new Error(`已经邀请对方了，请勿重复邀请`)
+    //       }
+    //     })
+    //   } catch (err) {
+    //     return { code: -9, message: err.message };
+    //   }
+    // }
+    
+
     try {
       await this.messageService.create({
         from: <UserDto>user,

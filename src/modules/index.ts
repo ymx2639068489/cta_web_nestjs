@@ -7,3 +7,4 @@ export * from './gxa_works/gxa_works.module';
 export * from './message/message.module';
 export * from './recruitment/recruitment.module';
 export * from './user/user.module';
+export * from './events/events.module';

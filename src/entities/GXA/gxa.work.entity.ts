@@ -34,4 +34,7 @@ export class GxaWork extends BaseEntity {
    */
   @Column({ nullable: true })
   githubUrl: string;
+
+  @Column({ nullable: true, default: false })
+  isApproved: boolean;
 }

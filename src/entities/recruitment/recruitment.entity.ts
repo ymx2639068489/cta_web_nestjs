@@ -3,6 +3,7 @@ import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "ty
 import { BaseEntity } from "../base.entity";
 import { User } from "../users";
 import { IdentityEnum } from '@/enum/identity.enum';
+import { RecruitmentStatus } from '@/enum/recruitment';
 @Entity()
 export class Recruitment extends BaseEntity {
   @PrimaryGeneratedColumn()
@@ -39,4 +40,8 @@ export class Recruitment extends BaseEntity {
   // 是否已经投递
   @Column({ type: 'bool', default: false })
   isDeliver: boolean;
+  
+  // 当前状态
+  @Column({ type: 'enum', enum: RecruitmentStatus, default: RecruitmentStatus.delivered })
+  status: RecruitmentStatus;
 }

@@ -4,3 +4,4 @@ export * from './allGxa.dto';
 export * from './updateGxaApplicationForm.dto'
 export * from './submitWorkGxa.dto';
 export * from './AllGxaWork.dto';
+export * from './get-all-gxa-work.dto';

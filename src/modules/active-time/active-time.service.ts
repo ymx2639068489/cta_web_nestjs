@@ -18,4 +18,10 @@ export class ActiveTimeService {
     const nowDate = new Date()
     return _1.startTime <= nowDate && nowDate <= _1.endTime
   }
+
+  async getAllActiveName() {
+    return await this.activeTimeRepository.find({
+      select: ['activeName']
+    })
+  }
 }
