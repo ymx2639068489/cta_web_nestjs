@@ -3,7 +3,7 @@ import { NoAuth } from '@/common/decorators/Role/customize';
 import { warpResponse } from '@/common/interceptors';
 import { Result } from '@/common/interface/result';
 import { CreateFileDto } from '@/dto/common/file.dto';
-import { AllGxaWorkDto, GetAllGxaWorkDto, SubmitGxaWorkDto } from '@/dto/GXA';
+import { AllGxaWorkDto, GetAllGxaWorkDto, GetSlefGxaWorkDto, SubmitGxaWorkDto } from '@/dto/GXA';
 import { Body, Controller, Get, Param, Post, Req, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -35,8 +35,8 @@ export class GxaWorksController {
 
   @Get()
   @ApiOperation({ description: '获取之前提交的作品信息_除压缩包以外的数据' })
-  @ApiResponse({ type: warpResponse({ type: AllGxaWorkDto }) })
-  async getGxaWorkInfo(@Req() { user }: any): Promise<Result<AllGxaWorkDto>> {
+  @ApiResponse({ type: warpResponse({ type: GetSlefGxaWorkDto }) })
+  async getGxaWorkInfo(@Req() { user }: any): Promise<Result<GetSlefGxaWorkDto>> {
     if (!await this.gxaWorkService.isActive()) {
       return { code: -1, message: '当前未在活动时间范围内' }
     }

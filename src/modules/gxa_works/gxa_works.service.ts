@@ -1,4 +1,4 @@
-import { AllGxaWorkDto, SubmitGxaWorkDto } from '@/dto/GXA';
+import { AllGxaWorkDto, GetSlefGxaWorkDto, SubmitGxaWorkDto } from '@/dto/GXA';
 import { GxaWork, GxaScore } from '@/entities/GXA';
 import { User } from '@/entities/users';
 import { Injectable } from '@nestjs/common';
@@ -82,7 +82,7 @@ export class GxaWorksService {
     }
   }
 
-  async getGxaWorkInfo(user: User): Promise<Result<AllGxaWorkDto>> {
+  async getGxaWorkInfo(user: User): Promise<Result<GetSlefGxaWorkDto>> {
     const application = await this.gxaApplicationService.findOneByLeader(user);
     if (!application || !application.isDeliver) return { code: -1, message: '用户没有提交报名表' };
     const _item = await this.gxaWorkRepository.findOne({

@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { IsBoolean, IsNotEmpty, IsNumber, IsString } from "class-validator";
 import { GxaDto } from "./allGxa.dto";
 
 export class AllGxaWorkDto {
@@ -29,4 +29,9 @@ export class AllGxaWorkDto {
   @IsNotEmpty()
   @ApiProperty({ description: '网站代码github地址' })
   githubUrl: string;
+
+  @IsBoolean()
+  @IsNotEmpty()
+  @ApiProperty({ description: '是否初审' })
+  isApproved: boolean;
 }

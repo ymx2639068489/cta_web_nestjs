@@ -30,7 +30,7 @@ export class UserController {
     @Body() _userLoginDto: UserLoginDto
   ): Promise<Result<string>> {
     // 获取签证后的jwt-token
-    return { code: 0, message: '登录成功', data: this.authService.login(req.user) };
+    return { code: 0, message: '登录成功', data: await this.authService.login(req.user) };
   }
 
   @Get('getUserInfo')

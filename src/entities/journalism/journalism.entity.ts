@@ -1,15 +1,15 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { BaseEntity } from '../base.entity';
-import { User } from '../users';
+import { AdminUser } from './admin-user.entity';
 
 @Entity()
 export class journalism extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
-  
+
   @JoinColumn()
-  @ManyToOne(() => User)
-  author: User;
+  @ManyToOne(() => AdminUser)
+  author: AdminUser;
 
   @Column()
   title: string;
@@ -19,4 +19,7 @@ export class journalism extends BaseEntity {
 
   @Column({ type: 'bool', default: false })
   isApprove: boolean;
+
+  @Column({ nullable: true })
+  reasonsForRefusal: string;
 }

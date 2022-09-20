@@ -9,10 +9,9 @@ export class JwtAuthGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
     // 在这里取metadata中的no-auth
     const noAuth = this.reflector.get<number>('no-auth', context.getHandler());
-    console.log(noAuth);
     if (noAuth === 0) return true;
     const guard = JwtAuthGuard.getAuthGuard(noAuth);
-    return guard.canActivate(context);    //    执行所选策略Guard的canActivate方法
+    return guard.canActivate(context);
   }
 
 //    根据NoAuth的t/f选择合适的策略Guard

@@ -24,7 +24,8 @@ export class AuthService {
     return null;
   }
 
-  login(user: getUserInfoDto): string {
+  async login(user: getUserInfoDto): Promise<string> {
+    // await this.userService.setLastLogin(user.id)
     return this.jwtService.sign(user);
   }
 }

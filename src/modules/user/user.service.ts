@@ -14,6 +14,25 @@ export class UserService {
     @InjectRepository(UserIdentity)
     private readonly userIdentityRepository: Repository<UserIdentity>,
   ) {}
+
+  // async setLastLogin(id: number) {
+  //   await this.userRepository.save(
+  //     await this.userRepository.preload({
+  //       ...await this.findOne(id),
+  //       lastLogin: new Date()
+  //     })
+  //   )
+  // }
+
+  // async getLastLoginTime(id: number) {
+  //   const now = new Date()
+  //   const _ = await this.findOne(id)
+  //   console.log(_, now);
+    
+  //   if (!_ || !_.lastLogin) return false;
+  //   return now >= _.lastLogin
+  // }
+
   async findOne(id: number): Promise<User> {
     return this.userRepository.findOne({
       where: { id },

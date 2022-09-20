@@ -47,7 +47,7 @@ import { JournalismModule } from './modules/journalism/journalism.module';
     GxaApplicationModule,
     GxaWorksModule,
     JournalismModule,
-    EventsModule,
+    // EventsModule,
   ],
   controllers: [UserController],
   providers: [
