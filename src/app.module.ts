@@ -20,6 +20,7 @@ import {
 } from './modules';
 import { BannerModule } from './modules/banner/banner.module';
 import { ComputerCompetitionModule } from './modules/computer-competition/computer-competition.module';
+import { NewbornAlgoirthmModule } from './modules/newborn-algoirthm/newborn-algoirthm.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -48,6 +49,7 @@ import { ComputerCompetitionModule } from './modules/computer-competition/comput
     JournalismModule,
     BannerModule,
     ComputerCompetitionModule,
+    NewbornAlgoirthmModule,
   ],
   controllers: [UserController],
   providers: [

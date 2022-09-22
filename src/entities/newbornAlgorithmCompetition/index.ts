@@ -11,5 +11,7 @@ export class newbornAlgoirthmCompetition extends BaseEntity {
   @JoinColumn()
   user: User;
   @Column({ enum: CompetitionAwardLevel, nullable: true, type: 'enum' })
-  awardLevel: CompetitionAwardLevel
+  awardLevel: CompetitionAwardLevel;
+  @Column({ type: 'boolean' })
+  school: boolean;
 }
