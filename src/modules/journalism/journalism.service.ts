@@ -10,25 +10,30 @@ export class JournalismService {
     private readonly journalismRepository: Repository<journalism>,
   ) {}
 
-  // 根据类型模糊查询新闻
-  async findOne(value: string) {
-    
+  async findOneById(id: number) {
+    const item = await this.journalismRepository.findOne({
+      where: { id, isApprove: true }
+    })
+    if (!item) return { code: -1, message: 'journalism is not found' };
+    return Api.ok({
+      ...item,
+      author: item.author.nickName
+    })
   }
   // 获取所有
   async findAll(page: number, pageSize: number, content: string) {
     let where: any;
     if (content) {
       where = [
+        // 查询标题或者内容
         { content, isApprove: true },
         { title: content, isApprove: true }
       ]
-    }
+    } else where = { isApprove: true }
     const [list, total] = await this.journalismRepository.findAndCount({
-      select: ['title', 'updatedAt'],
+      select: ['title', 'updatedAt', 'id'],
       where,
-      order: {
-        createdAt: 'DESC'
-      },
+      order: { createdAt: 'DESC' },
       skip: (page - 1) * pageSize,
       take: pageSize
     })
@@ -36,7 +41,7 @@ export class JournalismService {
       total: Math.ceil(total / pageSize),
       list,
       limit: pageSize,
-      page,
+      page
     })
   }
 }

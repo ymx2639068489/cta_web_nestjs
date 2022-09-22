@@ -1,4 +1,5 @@
-import { PickType } from '@nestjs/swagger';
+import { ApiProperty, PickType } from '@nestjs/swagger';
+import { IsNotEmpty, IsString } from 'class-validator';
 import { journalism } from './AllJournalism.dto';
 
 export class GetJournalismListDto extends PickType(journalism, [
@@ -6,3 +7,15 @@ export class GetJournalismListDto extends PickType(journalism, [
   'titla',
   'updatedAt'
 ]) {}
+export class GetJournalismDetailDto extends PickType(journalism, [
+  'id',
+  'titla',
+  'content',
+  'updatedAt'
+]) {
+  @ApiProperty({ description: '作者' })
+  @IsNotEmpty()
+  @IsString()
+  author: string;
+}
+

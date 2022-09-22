@@ -55,7 +55,7 @@ export class RecruitmentService {
     if (!data) {
       return { code: -1, message: '当前用户尚未填写过表单' };
     }
-    return { code: 0, message: '', data: <AllRecruitmentDto>data };
+    return { code: 0, message: '', data: <AllRecruitmentDto><unknown>data };
   }
 
   // 通过user.id 更新用户的申请表
@@ -101,91 +101,6 @@ export class RecruitmentService {
       return { code: -2, message: err }
     }
   }
-
-  // 通过role检查用户身份
-  // private getIdentityByRole(role: number) {
-  //   // 理事会
-  //   if ([Role.LSH_CWFHZ, Role.LSH_HZ, Role.LSH_JSFHZ, Role.LSH_ZGFZR].includes(role)) {
-  //     return IdentityEnum.LSH;
-  //   }
-  //   // 技术部
-  //   if ([Role.JSB_BZ, Role.JSB_FBZ].includes(role)) {
-  //     return IdentityEnum.TRCHNICAL_SERVICE;
-  //   }
-  //   // 项目部
-  //   if ([Role.XMB_BZ, Role.XMB_FBZ].includes(role)) {
-  //     return IdentityEnum.PROJECT_PRACTICE;
-  //   }
-  //   // 算法部
-  //   if ([Role.SFB_BZ, Role.SFB_FBZ].includes(role)) {
-  //     return IdentityEnum.ALGORITHM_CONTEST;
-  //   }
-  //   // 组宣部
-  //   if ([Role.ZXB_BZ, Role.ZXB_FBZ].includes(role)) {
-  //     return IdentityEnum.ORGANIZATION_PUBLICITY;
-  //   }
-  //   // 秘书处
-  //   if ([Role.MSC_FMS, Role.MSC_MSZ].includes(role)) {
-  //     return IdentityEnum.SECRETARIAT;
-  //   }
-  //   // 会员
-  //   // if (role === Role.member) return IdentityEnum.MEMBER;
-  //   throw new TypeError(`用户权限非法，干事和会员无法获取干事申请表`)
-  // }
-
-  // // 根据用户身份获取所有用户表
-  // async getAllRecruitment(
-  //   id: number, // user.id
-  //   pages: number,
-  //   pageSize: number,
-  //   department: string,
-  // ): Promise<Result<Recruitment>> {
-  //   const user = await this.userService.findOne(id);
-  //   if (!user) return { code: -4, message: '非法访问' };
-
-  //   const role = user.identity.id;
-  //   let userIdentity: IdentityEnum;
-  //   try {
-  //     userIdentity = this.getIdentityByRole(role);
-  //   } catch (err) {
-  //     return { code: -1, message: '干事不可查看或当前用户非法', data: err };
-  //   }
-
-  //   let data: any
-  //   if (userIdentity === IdentityEnum.LSH) {
-  //     let where: any = null;
-  //     if (department) {
-  //       where = [
-  //         { firstChoice: department, isDeliver: true },
-  //         { secondChoice: department, isDeliver: true },
-  //       ];
-  //     }
-  //     if (!where) where = { isDeliver: true };
-  //     data = await this.recruitmentRepository.find({
-  //       relations: ['user'],
-  //       where,
-  //       skip: pageSize * pages,
-  //       take: pageSize,
-  //     });
-  //   } else {
-  //     data = await this.recruitmentRepository.find({
-  //       where: [
-  //         { firstChoice: userIdentity },
-  //         { secondChoice: userIdentity }
-  //       ],
-  //       relations: ['user'],
-  //     });
-  //   }
-  //   return { 
-  //     code: 0,
-  //     message: `pages is ${pages}, page_size is ${pageSize}`,
-  //     data
-  //   };
-  // }
-
-
-  
-  
 
   // 会员确定申请表后点击提交
   async sureApplocation(id: number): Promise<Result<string>> {
@@ -234,7 +149,8 @@ export class RecruitmentService {
     
     const { data } = item;
     if (!data.isDeliver) return { code: -2, message: '当前用户尚未提交' };
-
+    // 如果没有被后台筛选（无论是什么操作，只要不是投递状态，就不能让用户修改）
+    if (data.status !== 1) return { code: -4, message: '当前用户已被操作，禁止重复提交' }
     const applocation = await this.recruitmentRepository.preload({
       id: data.id,
       isDeliver: false

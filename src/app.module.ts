@@ -6,7 +6,6 @@ import { CommonModule } from './common/common.module';
 import { UserController } from './modules/user/user.controller';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './common/guard/jwt.guard';
-import { TasksModule } from './tasks/tasks.module';
 import {
   GxaWorksModule,
   ActiveTimeModule,
@@ -17,9 +16,10 @@ import {
   AuthModule,
   UserModule,
   RecruitmentModule,
-  EventsModule
+  JournalismModule
 } from './modules';
-import { JournalismModule } from './modules/journalism/journalism.module';
+import { BannerModule } from './modules/banner/banner.module';
+import { ComputerCompetitionModule } from './modules/computer-competition/computer-competition.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -41,13 +41,13 @@ import { JournalismModule } from './modules/journalism/journalism.module';
     _CommonModule,
     AuthModule,
     EmailModule,
-    TasksModule,
     MessageModule,
     ActiveTimeModule,
     GxaApplicationModule,
     GxaWorksModule,
     JournalismModule,
-    // EventsModule,
+    BannerModule,
+    ComputerCompetitionModule,
   ],
   controllers: [UserController],
   providers: [

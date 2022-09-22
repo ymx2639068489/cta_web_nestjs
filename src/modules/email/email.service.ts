@@ -91,9 +91,7 @@ export class EmailService {
 
   private getMessageBody(type: EmailEnum, data: any): ISendMailOptions {
     switch(type) {
-      case EmailEnum.VerifyEmail: {
-        console.log(data);
-        
+      case EmailEnum.VerifyEmail: {        
         return {
           to: `${data.qq}@qq.com`,
           subject: '邮箱验证',
@@ -122,7 +120,6 @@ export class EmailService {
       case EmailEnum.AdmissionEmail: {
       }
       case EmailEnum.SubmitGxaApplicationEmail: {
-        console.log(data);
         return {
           to: `${data.qq}@qq.com`,
           subject: '国信安网页设计竞赛报名',

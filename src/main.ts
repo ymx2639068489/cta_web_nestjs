@@ -69,7 +69,7 @@ async function bootstrap() {
   app.use(helmet());
   // app.use(new HttpRequestMiddleware().use)
   await app.listen(3001);
-  console.log(`Application is running on: ${await app.getUrl()}`);
+  console.log(`Application front is running on: ${await app.getUrl()}`);
 }
 
 bootstrap();

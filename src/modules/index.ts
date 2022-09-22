@@ -8,3 +8,4 @@ export * from './message/message.module';
 export * from './recruitment/recruitment.module';
 export * from './user/user.module';
 export * from './events/events.module';
+export * from './journalism/journalism.module';

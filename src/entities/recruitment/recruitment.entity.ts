@@ -2,7 +2,7 @@ import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "ty
 // import { Url } from "url";
 import { BaseEntity } from "../base.entity";
 import { User } from "../users";
-import { IdentityEnum } from '@/enum/identity.enum';
+import { DepartmentEnum } from '@/enum/identity.enum';
 import { RecruitmentStatus } from '@/enum/recruitment';
 @Entity()
 export class Recruitment extends BaseEntity {
@@ -18,12 +18,16 @@ export class Recruitment extends BaseEntity {
   inchPhoto: string;
 
   // 第一志愿
-  @Column({ type: 'enum', enum: IdentityEnum, nullable: false })
-  firstChoice: IdentityEnum;
+  @Column({ type: 'enum', enum: DepartmentEnum, nullable: false })
+  firstChoice: DepartmentEnum;
 
   // 第二志愿
-  @Column({ type: 'enum', enum: IdentityEnum, nullable: false })
-  secondChoice: IdentityEnum;
+  @Column({ type: 'enum', enum: DepartmentEnum, nullable: false })
+  secondChoice: DepartmentEnum;
+
+  // 录取志愿
+  @Column({ nullable: true, enum: DepartmentEnum })
+  finallyDepartment: DepartmentEnum;
 
   // 是否调剂
   @Column({ type: 'bool', default: true, nullable: false })
