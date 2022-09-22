@@ -41,12 +41,12 @@ export class TestPaper extends BaseEntity {
   @Column({ type: 'longtext' })
   questions: string;
 
-  @Column({ type: 'int' })
+  @Column({ type: 'int', nullable: true })
   score: number;
 
   @Column({ type: 'datetime' })
   startTime: Date;
 
-  @Column({ type: 'datetime' })
-  endTime: Date;
+  @Column({ type: 'int', nullable: true })
+  totalDuration: number;
 }

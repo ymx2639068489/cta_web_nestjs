@@ -17,6 +17,7 @@ export enum activeName {
   recruitment_interview_notice = 'recruitment_interview_notice',
   // 设置干事阶段
   set_official = 'set_official',
+  computer_knowledge_competition = 'computer_knowledge_competition'
 }
 
 export const gxa_status = [

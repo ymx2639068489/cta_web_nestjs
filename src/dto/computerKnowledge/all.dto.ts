@@ -51,8 +51,8 @@ export class AllTestPaperDto {
 
   @IsString()
   @IsNotEmpty()
-  @ApiProperty({ description: '题目' })
-  questions: string;
+  @ApiProperty({ description: '题目', isArray: true, default: [1, 2, 3] })
+  questions: number[];
 
   @IsNumber()
   @IsNotEmpty()
