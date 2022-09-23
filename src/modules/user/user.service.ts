@@ -6,6 +6,8 @@ import { CreateUserDto, CreateUserIdentityDto, UpdateUserDto, UserLoginDto } fro
 import { User, UserIdentity } from '../../entities/users';
 import { Result } from '../../common/interface/result';
 import { Cache } from 'cache-manager';
+import { decrypt } from '@/common/utils/encryption';
+import { MD5 } from 'crypto-js';
 @Injectable()
 export class UserService {
   constructor(
@@ -50,6 +52,7 @@ export class UserService {
     createUserDto: CreateUserDto,
   ): Promise<Result<string>> {
     const { studentId } = createUserDto;
+    createUserDto.password = MD5(createUserDto.password).toString()
     const _1 = await this.findOneByStudentId(studentId);
     if (_1) return { code: -1, message: '注册失败，用户已经注册过了' };
     try {

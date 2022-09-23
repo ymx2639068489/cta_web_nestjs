@@ -54,13 +54,13 @@ export class ComputerCompetitionService {
       Judgmental: []
     }
     data.singleChoice = (await this.questionRepository.query(
-      'select id from question where type = 1 order by rand() limit 4'
+      'select id from question where type = 1 order by rand() limit 40'
     )).map((item: Question) => item.id)
     data.MultipleChoice = (await this.questionRepository.query(
-      'select id from question where type = 2 order by rand() limit 2'
+      'select id from question where type = 2 order by rand() limit 20'
     )).map((item: Question) => item.id)
     data.Judgmental = (await this.questionRepository.query(
-      'select id from question where type = 3 order by rand() limit 2'
+      'select id from question where type = 3 order by rand() limit 20'
     )).map((item: Question) => item.id)
     try {
       const questions = JSON.stringify([
@@ -139,6 +139,9 @@ export class ComputerCompetitionService {
     if (!JSON.parse(paper.questions).includes(id)) {
       return { code: -2, message: '非法访问，你查询的题目不是你做的' }
     }
-    return Api.ok(await this.questionRepository.findOne({ where: { id } }))
+    const item = await this.questionRepository.findOne({ where: { id } })
+    if (paper.score) return Api.ok(item)
+    delete item.ans
+    return Api.ok(item)
   }
 }

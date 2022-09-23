@@ -4,6 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
 import { AuthUserDto } from '@/dto/users';
+import { MD5 } from 'crypto-js';
 @Injectable()
 export class AuthService {
   constructor(
@@ -15,7 +16,7 @@ export class AuthService {
   }
   async validateUser(username: string, pass: string): Promise<AuthUserDto | null> {
     const user = await this.userService.findOneByStudentId(username);
-    if (user && user.password === pass) {
+    if (user && user.password === MD5(pass).toString()) {
       const result = {
         id: user.id
       }
@@ -25,7 +26,6 @@ export class AuthService {
   }
 
   async login(user: getUserInfoDto): Promise<string> {
-    // await this.userService.setLastLogin(user.id)
     return this.jwtService.sign(user);
   }
 }

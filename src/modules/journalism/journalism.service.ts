@@ -12,12 +12,15 @@ export class JournalismService {
 
   async findOneById(id: number) {
     const item = await this.journalismRepository.findOne({
-      where: { id, isApprove: true }
+      select: ['title', 'content', 'author', 'updatedAt', 'id'],
+      where: { id, isApprove: true },
+      relations: ['author'],
     })
     if (!item) return { code: -1, message: 'journalism is not found' };
     return Api.ok({
       ...item,
-      author: item.author.nickName
+      author: item.author.nickName,
+      time: item.updatedAt.getTime()
     })
   }
   // 获取所有
@@ -39,7 +42,10 @@ export class JournalismService {
     })
     return Api.pagerOk({
       total: Math.ceil(total / pageSize),
-      list,
+      list: list.map(item => ({
+        ...item,
+        time: item.updatedAt.getTime()
+      })),
       limit: pageSize,
       page
     })

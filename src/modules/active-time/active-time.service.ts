@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { gxa_status, activeName as activeNameEnum } from '@/enum/active-time';
+import { Api } from '@/common/utils/api';
 @Injectable()
 export class ActiveTimeService {
   constructor(
@@ -20,9 +21,11 @@ export class ActiveTimeService {
   }
 
   async getAllActiveName() {
-    return await this.activeTimeRepository.find({
-      select: ['activeName']
-    })
+    return Api.ok(
+      await this.activeTimeRepository.find({
+        select: ['activeName']
+      })
+    )
   }
 
   async queryGxaProgress() {

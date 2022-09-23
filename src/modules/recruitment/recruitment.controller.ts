@@ -29,6 +29,7 @@ export class RecruitmentController {
     if (!await this.recruitmentService.isActive()) {
       return { code: -10, message: '截止报名' }
     }
+    if (user.identity.id !== 20) return { code: -11, message: '您不需要填写干事申请表' }
     return await this.recruitmentService.updateUserApplication(user.id, updateRecruitmentDto);
   }
 
@@ -39,6 +40,7 @@ export class RecruitmentController {
     if (!await this.recruitmentService.isActive()) {
       return { code: -10, message: '截止报名' }
     }
+    if (user.identity.id !== 20) return { code: -11, message: '您不需要填写干事申请表' }
     return await this.recruitmentService.sureApplocation(user.id);
   }
 
@@ -49,6 +51,7 @@ export class RecruitmentController {
     if (!await this.recruitmentService.isActive()) {
       return { code: -10, message: '截止报名' }
     }
+    if (user.identity.id !== 20) return { code: -11, message: '您不需要填写干事申请表' }
     return await this.recruitmentService.cancelApplocation(user.id);
   }
 }
