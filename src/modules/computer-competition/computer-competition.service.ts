@@ -37,9 +37,7 @@ export class ComputerCompetitionService {
           score: item.score,
           totalDuration: item.totalDuration
         }
-      }),
-      page,
-      limit: pageSize
+      })
     })
   }
   // 开始答题
@@ -47,7 +45,8 @@ export class ComputerCompetitionService {
     const item = await this.testPaperRepository.findOne({
       where: { user }
     })
-    if (item?.score) return { code: -2, message: '用户已经答题过了' }
+    if (item && item?.score) return { code: -2, message: '用户已经答题过了' }
+    if (item) return Api.pagerOk({ list: JSON.parse(item.questions), total: 1 })
     const data = {
       singleChoice: [],
       MultipleChoice: [],

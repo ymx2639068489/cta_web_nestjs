@@ -41,10 +41,6 @@ export class ApiErrRes extends ApiBaseRes {
  * 分页Ok响应类
  */
 export class ApiPagerOkRes<TData = any> extends ApiBaseOkRes {
-  @ApiProperty({ description: '分页页码', default: 1 })
-  page: number;
-  @ApiProperty({ description: '分页页大小', default: 10 })
-  limit: number;
   @ApiProperty({ description: '总页数', default: 10 })
   total: number;
   @ApiProperty({ description: '分页列表' })

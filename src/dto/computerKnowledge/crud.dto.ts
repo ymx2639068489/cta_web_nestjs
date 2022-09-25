@@ -51,10 +51,6 @@ export class GetTestPaperDto {
 }
 
 export class TestPaperEndDto {
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty({ description: '学号' })
-  studentId: string;
   @IsNotEmpty()
   @ApiProperty({ description: '用户的答案', default: { '1': 1 } })
   questions: {

@@ -88,6 +88,18 @@ export class EmailService {
       return { code: -1, message: err };
     }
   }
+  async sendRegisterEmail(data: SendRecuritmentEmail) {
+    try {
+      const options = this.getMessageBody(
+        EmailEnum.register,
+        data,
+      );
+      await this.mailerService.sendMail(options);
+    } catch (err) {
+      console.error('发送邮件出错:', err);
+      return { code: -1, message: err };
+    }
+  }
 
   private getMessageBody(type: EmailEnum, data: any): ISendMailOptions {
     switch(type) {
@@ -141,6 +153,18 @@ export class EmailService {
             url: data.url,
             date: formatDate(new Date()),
             sign: '四川轻化工大学计算机技术协会',
+          }
+        }
+      }
+      case EmailEnum.register: {
+        return {
+          to: `${data.qq}@qq.com`,
+          subject: '欢迎信',
+          template: 'register.code.ejs',
+          context: {
+            username: data.username,
+            date: formatDate(new Date()),
+            sign: 'SUSE-CTA_秘书处: 熊李彦',
           }
         }
       }

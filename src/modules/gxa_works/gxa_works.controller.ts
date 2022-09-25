@@ -77,22 +77,21 @@ export class GxaWorksController {
     return await this.gxaWorkService.getFormulaGxaList()
   }
 
-  @Get('getTeamIsApprove/:studentId')
-  @ApiParam({ name: 'studentId' })
+  @Get('getTeamIsApprove')
   @ApiOperation({ description: '查询自己的作品是否初审成功' })
   @SwaggerOk()
-  async getTeamIsApprove(@Param('studentId') studentId: string): Promise<Result<boolean>> {
+  async getTeamIsApprove(@Req() { user }: any): Promise<Result<boolean>> {
+    const studentId = user.studentId
     if (!await this.activeService.isActive(activeName.GXA_approve)) {
       return { code: -1, message: '当前未到审核期' };
     }
     return await this.gxaWorkService.getTeamIsApprove(studentId)
   }
 
-  @Get('getTeamScore/:studentId')
-  @ApiParam({ name: 'studentId'})
+  @Get('getTeamScore')
   @ApiOperation({ description: '获取评委老师给自己打的分' })
   @SwaggerOk()
-  async getTeamScore(@Param('studentId') studentId: string): Promise<Result<number[]>> {
-    return this.gxaWorkService.getTeamScore(studentId)
+  async getTeamScore(@Req() { user }: any): Promise<Result<number[]>> {
+    return this.gxaWorkService.getTeamScore(user.studentId)
   }
 }

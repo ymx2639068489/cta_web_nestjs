@@ -3,8 +3,6 @@ import { ApiErrRes, ApiOkRes, ApiPagerOkRes } from '@/dto/api.dto';
 
 interface IPagerOkOpts {
   list: any[];
-  page: number;
-  limit: number;
   total: number;
 }
 type IErrArgs = [number, string?, Error?];
@@ -28,15 +26,11 @@ export class ApiPagerOk implements ApiPagerOkRes {
   code: number = API_CODES.OK;
   message: string = API_MSGS[API_CODES.OK];
   list: any;
-  page: number;
-  limit: number;
   total: number;
-  constructor({ list = [], page, limit: pageSize, total }: IPagerOkOpts) {
+  constructor({ list = [], total }: IPagerOkOpts) {
     // console.log(list);
     
     this.list = list;
-    this.page = page;
-    this.limit = pageSize;
     this.total = total;
   }
 }

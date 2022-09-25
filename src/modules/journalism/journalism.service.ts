@@ -45,9 +45,7 @@ export class JournalismService {
       list: list.map(item => ({
         ...item,
         time: item.updatedAt.getTime()
-      })),
-      limit: pageSize,
-      page
+      }))
     })
   }
 }

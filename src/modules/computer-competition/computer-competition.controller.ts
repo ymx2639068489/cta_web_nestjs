@@ -1,4 +1,5 @@
-import { SwaggerOk, SwaggerPagerOk } from '@/common/decorators';
+import { SwaggerOk, SwaggerPagerBody, SwaggerPagerOk } from '@/common/decorators';
+import { NoAuth } from '@/common/decorators/Role/customize';
 import {
   GetListDto,
   GetSelfQuestionIdListDto,
@@ -27,7 +28,7 @@ export class ComputerCompetitionController {
 
   @Get('start')
   @ApiOperation({ description: '开始答题，把题目返给用户' })
-  @SwaggerOk(GetTestPaperDto)
+  @SwaggerPagerOk(Number)
   async start(@Req() { user }: any) {
     if (!await this.activeService.isActive(activeName.computer_knowledge_competition)) {
       return { code: -10, message: '活动尚未开始' };
@@ -45,12 +46,10 @@ export class ComputerCompetitionController {
     if (!await this.activeService.isActive(activeName.computer_knowledge_competition)) {
       return { code: -10, message: '活动尚未开始' };
     }
-    if (user.studentId !== testPaperEndDto.studentId) {
-      return { code: -4, message: '学号错误' };
-    }
     return await this.computerService.end(user, testPaperEndDto)
   }
 
+  @NoAuth(0)
   @Get('getlist')
   @ApiOperation({ description: '获取榜单' })
   @SwaggerPagerOk(GetListDto)

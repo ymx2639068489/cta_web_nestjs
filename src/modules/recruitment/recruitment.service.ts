@@ -35,7 +35,7 @@ export class RecruitmentService {
     } = user;
     for (const key in items) {
       if (items[key] === null) {
-        return `your ${key} is null, please complete your personal information`;
+        return `your ${key} is null, 请完善个人信息`;
       }
     }
     return '';

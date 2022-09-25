@@ -10,7 +10,7 @@ import { User, UserIdentity } from '@/entities/users';
   imports: [
     TypeOrmModule.forFeature([User, UserIdentity]),
     CommonModule,
-    EmailModule,
+    EmailModule
   ],
   providers: [UserService],
   exports: [UserService]

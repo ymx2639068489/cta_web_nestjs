@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { gxa_status, activeName as activeNameEnum } from '@/enum/active-time';
 import { Api } from '@/common/utils/api';
+import { HttpService } from '@nestjs/axios'
 @Injectable()
 export class ActiveTimeService {
   constructor(

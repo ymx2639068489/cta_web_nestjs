@@ -46,6 +46,6 @@ export class Recruitment extends BaseEntity {
   isDeliver: boolean;
   
   // 当前状态
-  @Column({ type: 'enum', enum: RecruitmentStatus, default: RecruitmentStatus.delivered })
+  @Column({ type: 'enum', enum: RecruitmentStatus })
   status: RecruitmentStatus;
 }

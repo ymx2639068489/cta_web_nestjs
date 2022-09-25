@@ -5,6 +5,6 @@ export class CreateUserDto extends PickType(AllUserDto, [
   'username',
   'studentId',
   'password',
-  'phoneNumber',
+  'qq',
   'avatarUrl'
 ]) {}

@@ -1,4 +1,14 @@
-import { Controller, Post, Body, UseGuards, Get, Request, Patch, Param, Put, Query } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  Request,
+  Patch,
+  Put,
+  Query,
+  HttpServer
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { AllUserDto, CreateUserDto, UpdateUserDto, UserLoginDto } from '@/dto/users';
 import { Result } from '@/common/interface/result';
@@ -10,7 +20,11 @@ import { EmailService } from '../email/email.service';
 import { ForgotPasswordDto } from '@/dto/users';
 import { NoAuth } from '@/common/decorators/Role/customize';
 import { User } from '@/entities/users';
+import { SwaggerPagerOk } from '@/common/decorators';
 
+import { Api } from '@/common/utils/api';
+import { HttpService } from '@nestjs/axios';
+import { CollerAndMajorList } from "@/enum/coller_major"
 @ApiBearerAuth()
 @ApiTags('users')
 @Controller('users')
@@ -19,6 +33,7 @@ export class UserController {
     private readonly authService: AuthService,
     private readonly userService: UserService,
     private readonly emailService: EmailService,
+    private readonly http: HttpService
   ) {}
 
   @Post('login')
@@ -30,7 +45,7 @@ export class UserController {
     @Body() _userLoginDto: UserLoginDto
   ): Promise<Result<string>> {
     // 获取签证后的jwt-token
-    return { code: 0, message: '登录成功', data: await this.authService.login(req.user) };
+    return Api.ok(await this.authService.login(req.user));
   }
 
   @Get('getUserInfo')
@@ -47,6 +62,10 @@ export class UserController {
   @ApiOperation({ description: '用户注册, public' })
   @ApiResponse({ type: warpResponse({ type: 'string' }) })
   async create(@Body() createUserDto: CreateUserDto): Promise<Result<string>> {
+    if (createUserDto.studentId.length !== 11) {
+      return Api.err(-1, '学号长度必须为11')
+    }
+
     const user = await this.userService.findOneByStudentId(createUserDto.studentId)
     if (user) return { code: -5, message: '用户已被注册' }
     return await this.userService.createUser(createUserDto);
@@ -59,6 +78,9 @@ export class UserController {
     @Request() { user }: any,
     @Body() updateUserDto: UpdateUserDto,
   ): Promise<Result<string>> {
+    if (updateUserDto?.phoneNumber?.length !== 11) {
+      return Api.err(-1, '手机号长度必须为11位')
+    }
     return await this.userService.update(user.id, updateUserDto);
   }
 
@@ -114,5 +136,13 @@ export class UserController {
       class: user.class
     }
     return { code: 0, message: '', data }
+  }
+
+  @Get('getCollerList')
+  @NoAuth(0)
+  @ApiOperation({ description: '获取所有学院列表 public' })
+  @SwaggerPagerOk(String)
+  async getCollerList() {
+    return Api.ok(CollerAndMajorList)
   }
 }

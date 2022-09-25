@@ -1,0 +1,36 @@
+<div class="biu-nav-email"
+     style="max-width: 600px;min-width: 300px;margin: 40px auto;box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);font-size: 16px;padding: 20px;background-image: linear-gradient(135deg, #EAE5C9,#6CC6CB); border-radius: 5px;">
+     <h3 style="margin-bottom: 40px;">
+      亲爱的<%= locals.username %>同学：
+    </h3>
+    <div>
+      &nbsp;&nbsp;&nbsp;&nbsp;鲜花纷纷绽笑颜,捷报翩翩最灿烂。绽在心头芬芳绕,合家共同甜蜜笑。金榜题名无限好,不负十年多辛劳。继续扬帆勤钻研,书写明天新诗篇。<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;欢迎来到四川轻化工大学，在这里你将会开启人生的一个新篇章！<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;
+      <div class="nav" style="text-align:left;transition: all 3s ease-out;" @keyfarmes>
+          ─=≡Σ(((つ•̀ω•́)つ
+      </div>
+      <br>
+      &nbsp;&nbsp;&nbsp;&nbsp;计算机技术协会前身是2002年9月建立的大学生网络技术协会。在2017年3月因发展需求与学校改革需要，与大学生科技创新创业中心、大学生技术服务站共同组建成计算机技术协会。自创立以来，一直致力于对计算机文化和相关理念的传播，以及专业技术能力的培养。
+      本协会一直以传播计算机文化和相关理念，普及计算机技术知识，扶植计算机技术爱好者，开展学术讨论为宗旨。近年来颇有建树，在大大小小各种比赛中获取各类奖项:计算机设计大赛、服创、大创、蓝桥杯、ACM等若干省奖、国奖。
+      <br>
+      <br>
+      &nbsp;&nbsp;&nbsp;&nbsp;协会的目标是想让大家丰富大学生的校园生活，也想为计算机技术爱好者提供一个交流学习的平台，并且为有一定计算机技术能力的同学组织参加各类科技竞赛和创新活动。这对于同学们是一个不可或缺的机会，大家加入我们吧！﻿ε≡٩(๑>₃
+      <)۶ <br>
+          &nbsp;&nbsp;&nbsp;&nbsp;协会口号是以人为本，以技术为魂，以社会为舞台，以竞争为动力！
+    </div>
+    <p style="margin-top: 40px;text-align: right;">
+        <%= locals.sign %>
+    </p>
+    <p style="text-align: right;">
+        <%= locals.date %>
+    </p>
+</div>
+<script>
+  setTimeout(() => {
+    const nav = document.querySelector('.nav')
+    nav.style = undefined;
+    nav.style['margin-left'] = '200px';
+    console.log('111');
+  }, 8000)
+</script>

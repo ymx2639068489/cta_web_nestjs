@@ -9,5 +9,7 @@ export enum RecruitmentStatus {
   // 已录取
   Accepted = 4,
   // 已拒绝
-  Rejected = 5
+  Rejected = 5,
+  // 已成功录取
+  FinallyAccepted = 6,
 }

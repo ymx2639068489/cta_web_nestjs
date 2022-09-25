@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ActiveTimeService } from './active-time.service';
 import { ActiveTimeController } from './active-time.controller';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [

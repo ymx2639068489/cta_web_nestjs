@@ -8,6 +8,7 @@ import { Result } from '../../common/interface/result';
 import { Cache } from 'cache-manager';
 import { decrypt } from '@/common/utils/encryption';
 import { MD5 } from 'crypto-js';
+import { EmailService } from '../email/email.service';
 @Injectable()
 export class UserService {
   constructor(
@@ -15,6 +16,7 @@ export class UserService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(UserIdentity)
     private readonly userIdentityRepository: Repository<UserIdentity>,
+    private readonly emailService: EmailService
   ) {}
 
   // async setLastLogin(id: number) {
@@ -61,6 +63,10 @@ export class UserService {
       const item = this.userRepository.create({
         ...createUserDto,
         identity
+      })
+      await this.emailService.sendRegisterEmail({
+        qq: createUserDto.qq,
+        username: createUserDto.username
       })
       await this.userRepository.save(item);
       return { code: 0, message: '注册成功' };

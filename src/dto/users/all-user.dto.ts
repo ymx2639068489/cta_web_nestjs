@@ -9,7 +9,12 @@ export class AllUserDto {
   // 学号
   @IsString()
   @IsNotEmpty()
-  @ApiProperty({ description: '+学号', example: '20101010110' })
+  @ApiProperty({
+    description: '+学号',
+    example: '20101010110',
+    minLength: 11,
+    maxLength: 11,
+  })
   studentId: string;
 
   // 性别
@@ -45,7 +50,12 @@ export class AllUserDto {
   // 手机号
   @IsString()
   @IsNotEmpty()
-  @ApiProperty({ description: '+手机号', example: '1521' })
+  @ApiProperty({
+    description: '+手机号',
+    example: '1521',
+    minLength: 11,
+    maxLength: 11
+  })
   phoneNumber: string;
   // 头像地址
   @IsString()
