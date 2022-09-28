@@ -62,11 +62,12 @@ export class ComputerCompetitionService {
       'select id from question where type = 3 order by rand() limit 20'
     )).map((item: Question) => item.id)
     try {
-      const questions = JSON.stringify([
+      let _ = [
         ...data.singleChoice,
         ...data.MultipleChoice,
         ...data.Judgmental,
-      ])
+      ]
+      const questions = JSON.stringify(_)
       await this.testPaperRepository.save(
         this.testPaperRepository.create({
           user,
@@ -74,7 +75,7 @@ export class ComputerCompetitionService {
           startTime: new Date()
         })
       )
-      return Api.ok(data)
+      return Api.ok(_)
     } catch (err) {
       return { code: -1, message: err.message }
     }

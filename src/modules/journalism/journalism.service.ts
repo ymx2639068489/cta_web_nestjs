@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { journalism } from '@/entities/journalism';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { Api } from '@/common/utils/api';
 @Injectable()
 export class JournalismService {
@@ -29,8 +29,8 @@ export class JournalismService {
     if (content) {
       where = [
         // 查询标题或者内容
-        { content, isApprove: true },
-        { title: content, isApprove: true }
+        { content: Like(`%${content}%`), isApprove: true },
+        { title: Like(`%${content}%`), isApprove: true }
       ]
     } else where = { isApprove: true }
     const [list, total] = await this.journalismRepository.findAndCount({

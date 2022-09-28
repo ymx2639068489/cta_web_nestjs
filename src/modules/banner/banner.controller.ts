@@ -1,5 +1,6 @@
-import { SwaggerOk } from '@/common/decorators';
+import { SwaggerOk, SwaggerPagerOk } from '@/common/decorators';
 import { NoAuth } from '@/common/decorators/Role/customize';
+import { AllBannerDto } from '@/dto/banner';
 import { Controller,Get } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { BannerService } from './banner.service';
@@ -12,10 +13,17 @@ export class BannerController {
   ) {}
 
   @NoAuth(0)
-  @Get()
-  @ApiOperation({ description: '获取所有轮播图' })
-  @SwaggerOk()
-  async findAll() {
-    return await this.bannerService.findAll()
+  @Get('home')
+  @ApiOperation({ description: '获取首页轮播图' })
+  @SwaggerPagerOk(AllBannerDto)
+  async findHomeAll() {
+    return await this.bannerService.findHomeAll()
+  }
+  @NoAuth(0)
+  @Get('gxa')
+  @ApiOperation({ description: '获取国信安轮播图' })
+  @SwaggerPagerOk(AllBannerDto)
+  async findGxaAll() {
+    return await this.bannerService.findGxaAll()
   }
 }

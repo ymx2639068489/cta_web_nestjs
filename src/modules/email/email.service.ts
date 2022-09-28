@@ -67,7 +67,7 @@ export class EmailService {
         EmailEnum.SubmitGxaApplicationEmail,
         data,
       );
-      console.log(data)
+      // console.log(data)
       await this.mailerService.sendMail(options);
     } catch (err) {
       console.error('发送邮件出错:', err);
@@ -81,7 +81,7 @@ export class EmailService {
         EmailEnum.SubmitGxaWorksEmail,
         data,
       );
-      console.log(data)
+      // console.log(data)
       await this.mailerService.sendMail(options);
     } catch (err) {
       console.error('发送邮件出错:', err);

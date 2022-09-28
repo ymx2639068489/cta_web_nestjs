@@ -78,7 +78,9 @@ export class UserController {
     @Request() { user }: any,
     @Body() updateUserDto: UpdateUserDto,
   ): Promise<Result<string>> {
-    if (updateUserDto?.phoneNumber?.length !== 11) {
+    console.log(updateUserDto?.phoneNumber, updateUserDto?.phoneNumber?.length);
+    
+    if (updateUserDto.phoneNumber && updateUserDto.phoneNumber.length !== 11) {
       return Api.err(-1, '手机号长度必须为11位')
     }
     return await this.userService.update(user.id, updateUserDto);

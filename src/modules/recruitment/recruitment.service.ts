@@ -76,7 +76,7 @@ export class RecruitmentService {
     if (item?.data?.isDeliver) {
       return { code: -6, messae: '当前用户已提交，请取消提交后更改' };
     }
-    console.log(item);
+    // console.log(item);
     let recruitmentItem: Recruitment;
     if (item.code === 0) {
       // 表中有记录, 需要更新

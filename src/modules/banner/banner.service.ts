@@ -20,4 +20,14 @@ export class BannerService {
       }
     }))
   }
+  async findGxaAll() {
+    return Api.ok(await this.bannerRepository.query(
+      'select * from banner where rank % 2 = 1 order by rank ASC'
+    ))
+  }
+  async findHomeAll() {
+    return Api.ok(await this.bannerRepository.query(
+      'select * from banner where rank % 2 = 0 order by rank ASC'
+    ))
+  }
 }

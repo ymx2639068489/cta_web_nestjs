@@ -1,3 +1,4 @@
+import { SwaggerOk } from '@/common/decorators';
 import { JwtAuthGuard } from '@/common/guard';
 import { warpResponse } from '@/common/interceptors';
 import { Result } from '@/common/interface/result';
@@ -21,7 +22,7 @@ export class RecruitmentController {
 
   @Post('updateApplicationForm')
   @ApiOperation({ description: '更新用户的干事申请表信息' })
-  @ApiResponse({ type: warpResponse({ type: 'string' } ) })
+  @SwaggerOk()
   async create(
     @Request() { user }: any,
     @Body() updateRecruitmentDto: UpdateRecruitmentDto

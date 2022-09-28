@@ -11,7 +11,7 @@ export class WsStartGateway {
 
   @SubscribeMessage('hello')
   hello(@MessageBody() data: any): any {
-    console.log('111');
+    // console.log('111');
     
     return {
       "event": "hello",
