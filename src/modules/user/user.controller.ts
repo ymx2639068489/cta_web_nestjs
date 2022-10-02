@@ -62,10 +62,12 @@ export class UserController {
   @ApiOperation({ description: '用户注册, public' })
   @ApiResponse({ type: warpResponse({ type: 'string' }) })
   async create(@Body() createUserDto: CreateUserDto): Promise<Result<string>> {
-    if (createUserDto.studentId.length !== 11) {
-      return Api.err(-1, '学号长度必须为11')
+    // 检查数据合法性
+    try {
+      this.userService.checkData(createUserDto)
+    } catch (err) {
+      return Api.err(-1, err.message)
     }
-
     const user = await this.userService.findOneByStudentId(createUserDto.studentId)
     if (user) return { code: -5, message: '用户已被注册' }
     return await this.userService.createUser(createUserDto);

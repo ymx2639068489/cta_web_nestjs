@@ -19,6 +19,24 @@ export class UserService {
     private readonly emailService: EmailService
   ) {}
 
+  checkData(createUserDto: CreateUserDto) {
+    const { username, studentId, qq, avatarUrl } = createUserDto
+    const grader = Number(studentId.substring(0, 2))
+
+    if (studentId.length !== 11) throw new Error('学号长度必须为11')
+    if (
+      grader > Number(new Date().getFullYear().toString().substring(2, 4)) ||
+      grader < Number((new Date().getFullYear() - 3).toString().substring(2, 4))
+    ) throw new Error('学号错误')
+    if (isNaN(Number(studentId))) throw new Error('学号必须为纯数字')
+    if (username.match(/[0-9]/)) throw new Error('姓名不能包含数字')
+    if (username.length <= 1 || username.length >= 16) throw new Error('姓名错误')
+    if (!avatarUrl.match(
+      /https:\/\/school-serve.oss-cn-chengdu.aliyuncs.com\/upload/
+    )) throw new Error('头像错误')
+    if (!qq.match(/[1-9][0-9]{4,14}/)) throw new Error('qq错误')
+  }
+
   // async setLastLogin(id: number) {
   //   await this.userRepository.save(
   //     await this.userRepository.preload({
