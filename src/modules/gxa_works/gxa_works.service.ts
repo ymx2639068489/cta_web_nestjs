@@ -208,20 +208,20 @@ export class GxaWorksService {
 
   private async getWorkByStudentId(studentId: string) {
     const _u = await this.userService.findOneByStudentId(studentId)
-    if (!_u) new Error('未查询到用户');
+    if (!_u) throw new Error('未查询到用户');
     const _a = await this.gxaApplicationService.findOneByUser(_u)
-    if (!_a) new Error('未查询到报名表');
+    if (!_a) throw new Error('未查询到报名表');
     const _w = await this.gxaWorkRepository.findOne({
       where: { gxaApplicationForm: _a }
     })
-    if (!_w) new Error('未查询到作品');
+    if (!_w) throw new Error('未查询到作品');
     return _w
   }
 
   async getTeamIsApprove(studentId: string): Promise<Result<boolean>> {
     try {
       const _ = await this.getWorkByStudentId(studentId)
-      return { code: 0, message: '查询成功', data: _.isApproved };
+      return { code: 0, message: '查询成功', data: _?.isApproved };
     } catch (err) {
       return { code: -1, message: err.message };
     }
