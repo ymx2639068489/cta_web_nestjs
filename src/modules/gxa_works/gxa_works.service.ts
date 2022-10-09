@@ -37,7 +37,6 @@ export class GxaWorksService {
     submitGxaWorkDto: SubmitGxaWorkDto,
   ) {
     const application = await this.gxaApplicationService.findOneByLeader(user);
-    console.log(application);
     
     if (!application || !application.isDeliver) return { code: -1, message: '用户没有提交报名表' };
     if (application.group) {
@@ -52,8 +51,6 @@ export class GxaWorksService {
       where: { gxaApplicationForm: application }
     })
     let item: any;
-    // console.log(application);
-
     if (!_item) {
       if (!application.group) {
         item = this.gxaWorkRepository.create({
@@ -97,6 +94,7 @@ export class GxaWorksService {
     // 创建好文件夹, 之前的数据全删了
     await this.mkdir(user);
     const application = await this.gxaApplicationService.findOneByLeader(user)
+    if (application.group) return Api.err(-10, '动态组不能上传');
     if (!application || !application.isDeliver) return { code: -1, message: '用户没有提交报名表' };
     // 用户文件夹
     const userPath = `${this.GxaWorksBasePath}/${application.id}`
