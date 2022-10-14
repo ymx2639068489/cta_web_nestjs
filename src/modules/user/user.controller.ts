@@ -115,10 +115,10 @@ export class UserController {
     if (!f) {
       return { code: -1, message: '验证码错误' };
     }
+    await this.emailService.deleteCache('邮箱验证' + forgotPasswordDto.qq + '@qq.com')
     const { code, ...result } = forgotPasswordDto;
     return await this.userService.updateByStudentId(forgotPasswordDto.studentId, result)
   }
-
 
   @Get('findOne')
   @ApiQuery({ name: 'studentId' })

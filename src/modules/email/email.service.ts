@@ -21,7 +21,7 @@ export class EmailService {
   async sendverifyEmailCode(data: any): Promise<Result<string>> {
     if (!data.qq) return { code: -2, message: '请填写qq' };
     // check data.email
-    const lastDate = await this.cacheService.get('邮箱验证' + data.email);
+    const lastDate = await this.cacheService.get('邮箱验证' + data.qq + '@qq.com');
     if (lastDate) return { code: -3, message: '请稍后再试' };
     try {
       const code = Math.random().toString().slice(-6);
@@ -34,7 +34,7 @@ export class EmailService {
       )
       // 发送，提示用户已发送
       await this.mailerService.sendMail(sendMailOptions)
-      await this.cacheService.set('邮箱验证' + data.email, code, { ttl: 600 });
+      await this.cacheService.set('邮箱验证' + data.qq + '@qq.com', code, { ttl: 600 });
       return { code: 0, message: '已发送' };
     } catch (error) {
       console.error('发送邮件出错:', error);
@@ -46,6 +46,10 @@ export class EmailService {
     const { qq, code } = forgotPasswordDto;
     const value = await this.cacheService.get('邮箱验证' + qq + '@qq.com');
     return value === code;
+  }
+
+  async deleteCache(key: string) {
+    return await this.cacheService.del(key)
   }
 
   async sendRecuritmentEmail(data: SendRecuritmentEmail) {

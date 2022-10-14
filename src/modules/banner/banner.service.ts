@@ -22,12 +22,12 @@ export class BannerService {
   }
   async findGxaAll() {
     return Api.ok(await this.bannerRepository.query(
-      'select * from banner where rank % 2 = 1 order by rank ASC'
+      'select * from banner WHERE `rank` > 0 and `rank` & 1 = 1 AND `deletedAt` IS NULL ORDER BY `rank`;'
     ))
   }
   async findHomeAll() {
     return Api.ok(await this.bannerRepository.query(
-      'select * from banner where rank % 2 = 0 order by rank ASC'
+      'select * from banner where `rank` > 0 and `rank` & 1 = 0 AND `deletedAt` IS NULL order by `rank`;'
     ))
   }
 }

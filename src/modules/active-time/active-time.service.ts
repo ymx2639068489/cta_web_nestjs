@@ -34,10 +34,13 @@ export class ActiveTimeService {
       where: gxa_status.map((item: activeNameEnum) => ({ activeName: item }))
     })
     const nowDate = new Date()
+    _.sort((a, b) => {
+      const _1 = gxa_status.findIndex(item => item === a.activeName)
+      const _2 = gxa_status.findIndex(item => item === b.activeName)
+      return _1 - _2;
+    })
     for (const item of _) {
       if (item.startTime <= nowDate && nowDate <= item.endTime) {
-        console.log('11 -> ', item.activeName);
-        
         return item.activeName
       }
     }

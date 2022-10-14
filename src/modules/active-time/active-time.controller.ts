@@ -27,8 +27,6 @@ export class ActiveTimeController {
   @ApiOperation({ description: '查询国信安现在的进度' })
   async queryGxaProgress() {
     const _ = await this.activeService.queryGxaProgress()
-    console.log('item => ', _);
-    
     return Api.ok(_)
   }
   

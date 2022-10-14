@@ -120,7 +120,7 @@ export class GxaWorksService {
                 })
               }
             }
-            resolve({ code: 0, message: '上传成功,静态的请到对应的网址查看网站' })
+            resolve({ code: 0, message: '上传成功, 请查看邮箱' })
         });
       });
       zip.on('error', err => {
@@ -196,6 +196,7 @@ export class GxaWorksService {
         id: item.id,
         showImg: item.showImg,
         websiteUrl: item.websiteUrl,
+        workname: item.gxaApplicationForm.workName,
         websiteIntroduction: item.websiteIntroduction
       }      
       if (item.gxaApplicationForm.group) data.dynamic.push(__)
@@ -228,10 +229,12 @@ export class GxaWorksService {
   async getTeamScore(studentId: string) {
     try {
       const _ = await this.getWorkByStudentId(studentId)
-      const score = JSON.parse((await this.gxaScoreRepository.findOne({
+      const __ = await this.gxaScoreRepository.findOne({
         select: ['score'],
         where: { work: _ }
-      })).score)
+      })
+      if (!__) return Api.err(-2, '评委尚未打分，请等待')
+      const score = JSON.parse(__.score)
       const data: number[] = []
       for (const key in score) {
         data.push(score[key].reduce((pre: number, curt: number) => pre + curt, 0))
