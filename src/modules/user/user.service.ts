@@ -9,6 +9,7 @@ import { Cache } from 'cache-manager';
 import { decrypt } from '@/common/utils/encryption';
 import { MD5 } from 'crypto-js';
 import { EmailService } from '../email/email.service';
+import { Api } from '@/common/utils/api';
 @Injectable()
 export class UserService {
   constructor(
@@ -152,6 +153,7 @@ export class UserService {
     studentId: string,
     updateUserDto: UpdateUserDto,
   ): Promise<Result<string>> {
+    // if (updateUserDto.)result.password = 
     const user = await this.findOneByStudentId(studentId);
     if (!user) {
       return {
@@ -177,5 +179,20 @@ export class UserService {
       return { code: -2, message: err };
     }
   }
-
+  async updatePassword(studentId: string, password: string) {
+    const user = await this.findOneByStudentId(studentId)
+    if (!user) return Api.err(-2, 'user is not found')
+    try {
+      password = MD5(password).toString()
+      await this.userRepository.save(
+        await this.userRepository.preload({
+          ...user,
+          password
+        })
+      )
+      return Api.ok()
+    } catch (err) {
+      return Api.err(-1, err.message)
+    }
+  }
 }

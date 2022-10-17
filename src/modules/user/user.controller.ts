@@ -117,7 +117,7 @@ export class UserController {
     }
     await this.emailService.deleteCache('邮箱验证' + forgotPasswordDto.qq + '@qq.com')
     const { code, ...result } = forgotPasswordDto;
-    return await this.userService.updateByStudentId(forgotPasswordDto.studentId, result)
+    return await this.userService.updatePassword(forgotPasswordDto.studentId, result.password)
   }
 
   @Get('findOne')
