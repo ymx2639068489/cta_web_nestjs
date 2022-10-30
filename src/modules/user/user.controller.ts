@@ -37,15 +37,21 @@ export class UserController {
   ) {}
 
   @Post('login')
-  @NoAuth(-1)
+  @NoAuth(0)
   @ApiResponse({ type: warpResponse({ type: 'string' }) })
   @ApiOperation({ description: '用户登录' })
   async userLogin(
     @Request() req: any,
-    @Body() _userLoginDto: UserLoginDto
+    @Body() userLoginDto: UserLoginDto
   ): Promise<Result<string>> {
+    const user = await this.authService.validateUser(
+      userLoginDto.username,
+      userLoginDto.password
+    );
+    
+    if (!user) return Api.err(-1, '账号不存在或密码错误');
     // 获取签证后的jwt-token
-    return Api.ok(await this.authService.login(req.user));
+    return Api.ok(await this.authService.login(user));
   }
 
   @Get('getUserInfo')

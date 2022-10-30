@@ -27,14 +27,18 @@ export class UserService {
     if (studentId.length !== 11) throw new Error('学号长度必须为11')
     if (
       grader > Number(new Date().getFullYear().toString().substring(2, 4)) ||
-      grader < Number((new Date().getFullYear() - 3).toString().substring(2, 4))
+      grader < Number((new Date().getFullYear() - 5).toString().substring(2, 4))
     ) throw new Error('学号错误')
     if (isNaN(Number(studentId))) throw new Error('学号必须为纯数字')
     if (username.match(/[0-9]/)) throw new Error('姓名不能包含数字')
     if (username.length <= 1 || username.length >= 16) throw new Error('姓名错误')
     if (!avatarUrl.match(
       /https:\/\/school-serve.oss-cn-chengdu.aliyuncs.com\/upload/
-    )) throw new Error('头像错误')
+    )) {
+      if (avatarUrl !==
+        'https://pic3.zhimg.com/50/v2-588f36e96451c6487478cc07640e2f9d_hd.jpg?source=1940ef5c'
+      ) throw new Error('头像错误')
+    }
     if (!qq.match(/[1-9][0-9]{4,14}/)) throw new Error('qq错误')
   }
 
