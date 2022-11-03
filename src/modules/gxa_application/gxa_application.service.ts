@@ -17,6 +17,7 @@ import { desensitizationFn } from '@/common/utils/desensitization'
 import { ActiveTimeService } from '../active-time/active-time.service';
 import { Result } from '@/common/interface/result';
 import { EmailService } from '../email/email.service';
+import { Api } from '@/common/utils/api';
 @Injectable()
 export class GxaApplicationService {
   constructor(
@@ -329,7 +330,9 @@ export class GxaApplicationService {
   async sureApplication(user: User): Promise<Result<string>> {
     const application = await this.findOneByLeader(user);
     if (!application) return { code: -1, message: '当前用户没有组队或不是队长，请队长提交报名表' };
-
+    for (const key in ['workName', 'teamName', 'teamMemberSpecialty', 'introductionToWorks']) {
+      if (!application[key]) return Api.err(-7, `队伍信息不全（${key}），请先完善队伍信息`)
+    }
     if (application.isDeliver) return { code: -2, message: '已经提供过了，请勿重复提交' };
     const content = `你所在的队伍 ${application.teamName} 已提交报名表，若需要修改请在报名截止之前修改`
     try {

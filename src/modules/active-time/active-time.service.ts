@@ -44,7 +44,7 @@ export class ActiveTimeService {
         return item.activeName
       }
     }
-    return _
+    return null
   }
 
   async queryRecruitmentProgress() {
