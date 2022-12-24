@@ -46,15 +46,12 @@ export class GxaWorksController {
   @Post('upload')
   @UseInterceptors(FileInterceptor('file', {
     limits: {
-      fileSize: 300 * 1024 * 1024 // 300MB 单位为字节
+      fileSize: 300 * 1024 * 1024 * 8 // 300MB 单位为字节
     },
   }))
   @ApiOperation({ description: '上传国信安作品, 压缩包请保持在300MB以内' })
   @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    description: '文件压缩包',
-    type: CreateFileDto,
-  })
+  @ApiBody({ description: '文件压缩包', type: CreateFileDto, })
   @ApiResponse({ type: warpResponse({ type: 'string' }) })
   async uploadFile(
     @Req() { user }: any,

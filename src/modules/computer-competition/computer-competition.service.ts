@@ -96,7 +96,7 @@ export class ComputerCompetitionService {
         select: ['ans', 'type'],
         where: { id: item.key }
       })
-      if ((_res.ans & item.value) === item.value) {
+      if ((_res?.ans & item.value) === item.value) {
         if (_res.type === 2) score += 2;
         else score ++;
       }

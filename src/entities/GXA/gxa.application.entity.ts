@@ -49,5 +49,5 @@ export class GxaApplicationForm extends BaseEntity {
   portNumber: number;
   // 是否报名
   @Column({ type: 'bool', default: false })
-  isDeliver: boolean;
+  isDeliver?: boolean;
 }

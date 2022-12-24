@@ -13,8 +13,8 @@ console.log(process.env);
         host: 'smtp.qq.com',
         port: 465,
         auth: {
-          user: process.env.EMAIL_AUTH_USER,
-          pass: process.env.EMAIL_AUTH_PASS
+          user: '3491357178@qq.com',
+          pass: 'xmnngyfxkkumcihf'
         }
       },
       preview: false,

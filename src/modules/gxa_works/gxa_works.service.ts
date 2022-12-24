@@ -39,31 +39,18 @@ export class GxaWorksService {
     const application = await this.gxaApplicationService.findOneByLeader(user);
     
     if (!application || !application.isDeliver) return { code: -1, message: '用户没有提交报名表' };
-    if (application.group) {
-      if (!submitGxaWorkDto.githubUrl || !submitGxaWorkDto.websiteUrl) {
-        return { code: -3, message: '请填写网站部署地址以及github地址' };
-      }
-    } else {
-      delete submitGxaWorkDto.githubUrl;
-      delete submitGxaWorkDto.websiteUrl;
+    if (!submitGxaWorkDto.githubUrl || !submitGxaWorkDto.websiteUrl) {
+      return { code: -3, message: '请填写网站部署地址以及github地址' };
     }
     const _item = await this.gxaWorkRepository.findOne({
       where: { gxaApplicationForm: application }
     })
     let item: any;
     if (!_item) {
-      if (!application.group) {
-        item = this.gxaWorkRepository.create({
-          gxaApplicationForm: application,
-          websiteUrl: `http://yumingxi.xyz:${application.portNumber}`,
-          ...submitGxaWorkDto,
-        });
-      } else {
-        item = this.gxaWorkRepository.create({
-          gxaApplicationForm: application,
-          ...submitGxaWorkDto,
-        });
-      }
+      item = this.gxaWorkRepository.create({
+        gxaApplicationForm: application,
+        ...submitGxaWorkDto,
+      });
     } else {
       item = await this.gxaWorkRepository.preload({
         id: _item.id,
@@ -185,6 +172,9 @@ export class GxaWorksService {
 
   async getFormulaGxaList() {
     const _list = await this.gxaWorkRepository.find({
+      where: {
+        isApproved: true
+      },
       relations: ['gxaApplicationForm']
     });
     const data = {
@@ -228,7 +218,7 @@ export class GxaWorksService {
 
   async getTeamScore(studentId: string) {
     try {
-      const _ = await this.getWorkByStudentId(studentId)
+      const _ = await this.getWorkByStudentId(studentId);
       const __ = await this.gxaScoreRepository.findOne({
         select: ['score'],
         where: { work: _ }
