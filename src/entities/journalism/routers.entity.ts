@@ -1,15 +1,9 @@
 import {
   Column,
   Entity,
-  JoinColumn,
   JoinTable,
   ManyToMany,
-  ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
-  Tree,
-  TreeChildren,
-  TreeParent,
 } from 'typeorm';
 import { Roles } from './roles.entity';
 import { BaseEntity } from '../base.entity';
