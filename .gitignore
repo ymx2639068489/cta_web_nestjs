@@ -5,6 +5,7 @@ node_modules
 /GXA_WORKS
 /static
 /src/config/
+
 # Logs
 logs
 *.log
