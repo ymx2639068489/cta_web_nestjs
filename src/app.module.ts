@@ -15,12 +15,13 @@ import {
   AuthModule,
   UserModule,
   RecruitmentModule,
-  JournalismModule
+  JournalismModule,
 } from './modules';
 import { BannerModule } from './modules/banner/banner.module';
 import { ComputerCompetitionModule } from './modules/computer-competition/computer-competition.module';
 import { NewbornAlgoirthmModule } from './modules/newborn-algoirthm/newborn-algoirthm.module';
 import { HttpModule } from '@nestjs/axios';
+
 @Module({
   imports: [
     ConfigModule.forRoot({

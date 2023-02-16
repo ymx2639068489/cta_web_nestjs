@@ -7,12 +7,22 @@ import {
   Patch,
   Put,
   Query,
-  HttpServer
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { AllUserDto, CreateUserDto, UpdateUserDto, UserLoginDto } from '@/dto/users';
+import {
+  AllUserDto,
+  CreateUserDto,
+  UpdateUserDto,
+  UserLoginDto,
+} from '@/dto/users';
 import { Result } from '@/common/interface/result';
-import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { warpResponse } from '@/common/interceptors';
 import { AuthService } from '../auth/auth.service';
 import { getUserInfoDto } from '@/dto/users';
@@ -24,7 +34,7 @@ import { SwaggerPagerOk } from '@/common/decorators';
 
 import { Api } from '@/common/utils/api';
 import { HttpService } from '@nestjs/axios';
-import { CollerAndMajorList } from "@/enum/coller_major"
+import { CollerAndMajorList } from '@/enum/coller_major';
 @ApiBearerAuth()
 @ApiTags('users')
 @Controller('users')
@@ -33,7 +43,7 @@ export class UserController {
     private readonly authService: AuthService,
     private readonly userService: UserService,
     private readonly emailService: EmailService,
-    private readonly http: HttpService
+    private readonly http: HttpService,
   ) {}
 
   @Post('login')
@@ -42,13 +52,13 @@ export class UserController {
   @ApiOperation({ description: '用户登录' })
   async userLogin(
     @Request() req: any,
-    @Body() userLoginDto: UserLoginDto
+    @Body() userLoginDto: UserLoginDto,
   ): Promise<Result<string>> {
     const user = await this.authService.validateUser(
       userLoginDto.username,
-      userLoginDto.password
+      userLoginDto.password,
     );
-    
+
     if (!user) return Api.err(-1, '账号不存在或密码错误');
     // 获取签证后的jwt-token
     return Api.ok(await this.authService.login(user));
@@ -58,8 +68,8 @@ export class UserController {
   @ApiOperation({ description: '获取用户信息' })
   @ApiResponse({ type: warpResponse({ type: getUserInfoDto }) })
   async getProfile(@Request() req: any): Promise<Result<User>> {
-    const data = await this.userService.findOne(req.user.id)
-    delete data.password
+    const data = await this.userService.findOne(req.user.id);
+    delete data.password;
     return { code: 0, message: '获取成功', data };
   }
 
@@ -70,12 +80,14 @@ export class UserController {
   async create(@Body() createUserDto: CreateUserDto): Promise<Result<string>> {
     // 检查数据合法性
     try {
-      this.userService.checkData(createUserDto)
+      this.userService.checkData(createUserDto);
     } catch (err) {
-      return Api.err(-1, err.message)
+      return Api.err(-1, err.message);
     }
-    const user = await this.userService.findOneByStudentId(createUserDto.studentId)
-    if (user) return { code: -5, message: '用户已被注册' }
+    const user = await this.userService.findOneByStudentId(
+      createUserDto.studentId,
+    );
+    if (user) return { code: -5, message: '用户已被注册' };
     return await this.userService.createUser(createUserDto);
   }
 
@@ -87,9 +99,9 @@ export class UserController {
     @Body() updateUserDto: UpdateUserDto,
   ): Promise<Result<string>> {
     console.log(updateUserDto?.phoneNumber, updateUserDto?.phoneNumber?.length);
-    
+
     if (updateUserDto.phoneNumber && updateUserDto.phoneNumber.length !== 11) {
-      return Api.err(-1, '手机号长度必须为11位')
+      return Api.err(-1, '手机号长度必须为11位');
     }
     return await this.userService.update(user.id, updateUserDto);
   }
@@ -105,37 +117,45 @@ export class UserController {
     @Query('studentId') studentId: string,
   ): Promise<Result<string>> {
     const user = await this.userService.findOneByStudentId(studentId);
-    if (!user || user.qq !== qq) return { code: -4, message: '用户不存在或未完善个人信息' };
+    if (!user || user.qq !== qq)
+      return { code: -4, message: '用户不存在或未完善个人信息' };
 
     return await this.emailService.sendverifyEmailCode({ qq });
   }
 
   @Patch('updateUserPassword')
   @NoAuth(0)
-  @ApiOperation({ description: '用户忘记密码时、同一调用此接口（邮箱验证）, public' })
+  @ApiOperation({
+    description: '用户忘记密码时、同一调用此接口（邮箱验证）, public',
+  })
   @ApiResponse({ type: warpResponse({ type: 'string' }) })
   async forgotPassword(
-    @Body() forgotPasswordDto: ForgotPasswordDto
+    @Body() forgotPasswordDto: ForgotPasswordDto,
   ): Promise<Result<string>> {
     const f = await this.emailService.verifyMailbox(forgotPasswordDto);
     if (!f) {
       return { code: -1, message: '验证码错误' };
     }
-    await this.emailService.deleteCache('邮箱验证' + forgotPasswordDto.qq + '@qq.com')
+    await this.emailService.deleteCache(
+      '邮箱验证' + forgotPasswordDto.qq + '@qq.com',
+    );
     const { code, ...result } = forgotPasswordDto;
-    return await this.userService.updatePassword(forgotPasswordDto.studentId, result.password)
+    return await this.userService.updatePassword(
+      forgotPasswordDto.studentId,
+      result.password,
+    );
   }
 
   @Get('findOne')
   @ApiQuery({ name: 'studentId' })
   @ApiOperation({ description: '查找一个用户，' })
-  @ApiResponse({ type: warpResponse({ type: AllUserDto })})
+  @ApiResponse({ type: warpResponse({ type: AllUserDto }) })
   async findOne(@Query('studentId') studentId: 'string'): Promise<Result<any>> {
     // return studentId;
-    const user = await this.userService.findOneByStudentId(studentId)
-    // return 
+    const user = await this.userService.findOneByStudentId(studentId);
+    // return
     if (!user) {
-      return { code: -1, message: `studentId: ${studentId} not fount`}
+      return { code: -1, message: `studentId: ${studentId} not fount` };
     }
     const data = {
       username: user.username,
@@ -143,9 +163,9 @@ export class UserController {
       avatarUrl: user.avatarUrl,
       college: user.college,
       major: user.major,
-      class: user.class
-    }
-    return { code: 0, message: '', data }
+      class: user.class,
+    };
+    return { code: 0, message: '', data };
   }
 
   @Get('getCollerList')
@@ -153,6 +173,6 @@ export class UserController {
   @ApiOperation({ description: '获取所有学院列表 public' })
   @SwaggerPagerOk(String)
   async getCollerList() {
-    return Api.ok(CollerAndMajorList)
+    return Api.ok(CollerAndMajorList);
   }
 }
