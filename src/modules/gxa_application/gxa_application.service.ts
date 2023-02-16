@@ -178,8 +178,9 @@ export class GxaApplicationService {
         leader: agreeInvitationDto.fromUserId,
         teamName: agreeInvitationDto.teamName,
       },
-      relations: ['teamMember1', 'teamMember2'],
+      relations: ['leader','teamMember1', 'teamMember2'],
     });
+    
     // 检查对方队伍是否有效
     if (!form) return Api.err(-3, '对方队伍已解散, 请重新邀请');
     // 检查B是否真的向A发送邀请了

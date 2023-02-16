@@ -7,7 +7,7 @@ import {
   EMAIL_AUTH_PASS,
   EMAIL_AUTH_USER,
   EMAIL_AUTH_USERNAME,
-} from '@/config/app.config';
+} from '../../config/app.config';
 @Module({
   imports: [
     CacheModule.register(),

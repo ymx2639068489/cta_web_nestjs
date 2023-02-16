@@ -68,7 +68,7 @@ async function bootstrap() {
   // Helmet 可以帮助保护应用免受一些众所周知的 Web 漏洞的影响
   app.use(helmet());
   // app.use(new HttpRequestMiddleware().use)
-  await app.listen(1576);
+  await app.listen(3002);
   console.log(`Application front is running on: ${await app.getUrl()}`);
 }
 

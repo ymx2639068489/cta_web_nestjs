@@ -81,7 +81,6 @@ export class UserService {
     });
   }
 
-<<<<<<< HEAD
   async findOneByQQ(qq: string): Promise<User> {
     return this.userRepository.findOne({
       where: { qq },
@@ -92,9 +91,6 @@ export class UserService {
   async createUser(
     createUserDto: CreateUserDto,
   ): Promise<Result<string>> {
-=======
-  async createUser(createUserDto: CreateUserDto): Promise<Result<string>> {
->>>>>>> e1d8428e705c9f31d45f9d6ae57b6e37f806530c
     const { studentId } = createUserDto;
     createUserDto.password = MD5(createUserDto.password).toString();
     const _1 = await this.findOneByStudentId(studentId);
