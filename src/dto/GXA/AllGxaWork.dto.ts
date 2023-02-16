@@ -13,12 +13,12 @@ export class AllGxaWorkDto {
 
   @IsString()
   @ApiProperty({ description: '网站首页截图' })
-  showImg: string;
+  indexHtmlImg: string;
 
   @IsString()
   @IsNotEmpty()
   @ApiProperty({ description: '网站简介' })
-  websiteIntroduction: string;
+  introductionToWorks: string;
 
   @IsString()
   @IsNotEmpty()

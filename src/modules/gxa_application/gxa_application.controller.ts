@@ -1,11 +1,18 @@
+import { SwaggerOk } from '@/common/decorators';
+import { NoAuth } from '@/common/decorators/Role/customize';
 import { warpResponse } from '@/common/interceptors';
 import { Result } from '@/common/interface/result';
+import { Api } from '@/common/utils/api';
 import {
   CreateApplicationFormDto,
   AgreeInvitationDto,
-  UpdateGxaApplicationFormDto
+  UpdateGxaApplicationFormDto,
+  GetAllGxaWorkDto,
+  SubmitGxaWorkDto,
+  GetSlefGxaWorkDto
 } from '@/dto/GXA';
 import { GxaDto } from '@/dto/GXA/allGxa.dto';
+import { activeName } from '@/enum/active-time';
 import {
   Controller,
   Get,
@@ -19,13 +26,17 @@ import {
   Put
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ActiveTimeService } from '../active-time/active-time.service';
 import { GxaApplicationService } from './gxa_application.service';
 
 @ApiBearerAuth()
 @ApiTags('gxa_application')
 @Controller('gxa_application')
 export class GxaApplicationController {
-  constructor(private readonly gxaService: GxaApplicationService) {}
+  constructor(
+    private readonly gxaService: GxaApplicationService,
+    private readonly activeTimeService: ActiveTimeService,
+  ) {}
 
   @Post('createApplicationForm')
   @ApiOperation({ description: '第一次创建报名表，只用填写队伍名就可以了' })
@@ -41,30 +52,28 @@ export class GxaApplicationController {
   }
 
   @Get('inviteStudent')
-  @ApiQuery({ name: 'studentId'})
+  @ApiQuery({ name: 'studentId' })
   @ApiOperation({ description: '通过学号，邀请同学组队' })
-  @ApiResponse({ type: warpResponse({ type: 'string' })})
+  @SwaggerOk(String)
   async inviteStudent(
     @Req() { user }: any,
     @Query('studentId') studentId: string,
   ) {
     if (!await this.gxaService.register_isActive()) {
-      return { code: -10, message: '当前未到报名时间或已结束' };
+      return Api.err(-10, '当前未到报名时间或已结束');
     }
     return await this.gxaService.inviteStudent(user, studentId);
   }
 
+  @NoAuth()
   @Post('agreeInvitation')
   @ApiOperation({ description: '消息模块的回调函数接口，用于同意好友的国信安组队邀请' })
   @ApiResponse({ type: warpResponse({ type: 'string' })})
-  async agreeInvitation(
-    @Req() { user }: any,
-    @Body() agreeInvitationDto: AgreeInvitationDto
-  ) {
+  async agreeInvitation(@Body() agreeInvitationDto: AgreeInvitationDto) {
     if (!await this.gxaService.register_isActive()) {
       return { code: -10, message: '当前未到报名时间或已结束' };
     }
-    return await this.gxaService.agreenInvitation(user, agreeInvitationDto);
+    return await this.gxaService.agreenInvitation(agreeInvitationDto);
   }
 
   @Delete('deleteTeam')
@@ -144,9 +153,69 @@ export class GxaApplicationController {
   @ApiOperation({ description: '判断自己是否为队长' })
   @ApiResponse({ type: warpResponse({ type: 'boolean' }) })
   async isLeader(@Req() { user }: any): Promise<Result<boolean>> {
-    // if (!await this.gxaService.register_isActive()) {
-    //   return { code: -10, message: '当前未到报名时间或已结束' };
-    // }
-    return this.gxaService.isLeader(user);
+    return await this.gxaService.isLeader(user);
+  }
+
+  @Get('getTeamScore')
+  @ApiOperation({ description: '获取评委老师给自己打的分' })
+  @SwaggerOk()
+  async getTeamScore(@Req() { user }: any): Promise<Result<number[]>> {
+    return await this.gxaService.getTeamScore(user)
+  }
+
+  @Get('getTeamIsApprove')
+  @ApiOperation({ description: '查询自己的作品是否初审成功' })
+  @SwaggerOk()
+  async getTeamIsApprove(@Req() { user }: any): Promise<Result<boolean>> {
+    if (!await this.gxaService.approve_isActive()) {
+      return { code: -1, message: '当前未到审核期' };
+    }
+    return await this.gxaService.getTeamIsApprove(user);
+  }
+  @Get('getFormulaGxaList')
+  @NoAuth(0)
+  @ApiOperation({ description: '获取公示列表, public' })
+  @SwaggerOk(GetAllGxaWorkDto)
+  async getFormulaGxaList(): Promise<Result<GetAllGxaWorkDto>> {
+    if (!await this.activeTimeService.isActive(activeName.GXA_works_scoring)) {
+      return { code: -1, message: '当前未到公式期' };
+    }
+    return await this.gxaService.getFormulaGxaList()
+  }
+
+  
+  @Post('submit')
+  @ApiOperation({ description: '提交作品_除压缩包以外的数据' })
+  @ApiResponse({ type: warpResponse({ type: 'string' }) })
+  async submitWord(
+    @Req() { user }: any,
+    @Body() submitGxaWorkDto: SubmitGxaWorkDto
+  ): Promise<Result<string>> {
+    if (!await this.activeTimeService.isActive('GXA_works')) {
+      return Api.err(-4, '当前未在活动时间范围内'); 
+    }
+    return await this.gxaService.submitWord(user, submitGxaWorkDto)
+  }
+
+  @Get()
+  @ApiOperation({ description: '获取之前提交的作品信息_除压缩包以外的数据' })
+  @ApiResponse({ type: warpResponse({ type: GetSlefGxaWorkDto }) })
+  async getGxaWorkInfo(@Req() { user }: any): Promise<Result<GetSlefGxaWorkDto>> {
+    if (!await this.activeTimeService.isActive('GXA_works')) {
+      return Api.err(-1, '当前未在活动时间范围内'); 
+    }
+    return await this.gxaService.getGxaWorkInfo(user)
+  }
+
+  
+  @NoAuth(0)
+  @Get('getFinallyList')
+  @ApiOperation({ description: 'public 获取决赛名单' })
+  @SwaggerOk()
+  async getFinalsTeamList() {
+    if (!await this.activeTimeService.isActive(activeName.GXA_finals)) {
+      return { code: -10, message: '未到时间'}
+    }
+    return await this.gxaService.getFinalsTeamList()
   }
 }

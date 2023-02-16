@@ -3,9 +3,8 @@ import { AllGxaWorkDto } from "./AllGxaWork.dto";
 
 export class GetSlefGxaWorkDto extends PickType(AllGxaWorkDto, [
   'id',
-  'showImg',
-  'websiteIntroduction',
+  'indexHtmlImg',
+  'introductionToWorks',
   'websiteUrl',
   'githubUrl',
-  'isApproved'
 ]) {}

@@ -3,8 +3,8 @@ import { AllGxaWorkDto } from './AllGxaWork.dto';
 
 export class SubmitGxaWorkDto extends IntersectionType(
   class temp1 extends PickType(AllGxaWorkDto, [
-    'showImg', // 首页
-    'websiteIntroduction', // 网站简介
+    'indexHtmlImg', // 首页
+    'introductionToWorks', // 网站简介
   ]) {},
   class temp2 extends PartialType(
     class temp3 extends PickType(AllGxaWorkDto, [

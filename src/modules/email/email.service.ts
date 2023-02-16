@@ -6,6 +6,7 @@ import { Cache } from 'cache-manager';
 import { ForgotPasswordDto } from '@/dto/users';
 import { EmailEnum } from '@/enum/email';
 import {
+  InviteGxaByStudentEmail,
   SendRecuritmentEmail,
   SubmitGxaApplicationEmail,
   SubmitGxaWorksEmail
@@ -105,6 +106,19 @@ export class EmailService {
     }
   }
 
+  async sendInviteGxaByStudentEmail(data: InviteGxaByStudentEmail) {
+    try {
+      const options = this.getMessageBody(
+        EmailEnum.InviteGxaByStudentEmail,
+        data,
+      );
+      await this.mailerService.sendMail(options);
+    } catch (err) {
+      console.error('发送邮件出错:', err);
+      return { code: -1, message: err };
+    }
+  }
+
   private getMessageBody(type: EmailEnum, data: any): ISendMailOptions {
     switch(type) {
       case EmailEnum.VerifyEmail: {        
@@ -169,6 +183,21 @@ export class EmailService {
             username: data.username,
             date: formatDate(new Date()),
             sign: 'SUSE-CTA_秘书处: 熊李彦',
+          }
+        }
+      }
+      case EmailEnum.InviteGxaByStudentEmail: {
+        return {
+          to: `${data.qq}@qq.com`,
+          subject: '邀请通知',
+          template: 'InviteGxaByStudentEmail.ejs',
+          context: {
+            fromUsername: data.fromUsername,
+            toUsername: data.toUsername,
+            teamName: data.teamName,
+            agreenInvitationUrl: `${data.agreenInvitation}/?teamName=${data.teamName}&from=${data.fromUsername}&qq=${data.qq}&fromUserId=${data.fromUserId}`,
+            date: formatDate(new Date()),
+            sign: '四川轻化工大学计算机技术协会',
           }
         }
       }

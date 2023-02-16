@@ -5,5 +5,6 @@ export enum EmailEnum {
   AdmissionEmail = '录取通知',
   SubmitGxaApplicationEmail = '提交国信安报名表',
   SubmitGxaWorksEmail = '提交国信安代码',
-  register = '用户注册'
+  register = '用户注册',
+  InviteGxaByStudentEmail = '邀请好友组队国信安',
 }

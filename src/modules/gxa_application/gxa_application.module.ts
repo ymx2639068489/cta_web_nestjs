@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { CacheModule, Module } from '@nestjs/common';
 import { GxaApplicationService } from './gxa_application.service';
 import { GxaApplicationController } from './gxa_application.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -13,9 +13,8 @@ import { EmailModule } from '../email/email.module';
     EmailModule,
     MessageModule,
     ActiveTimeModule,
-    TypeOrmModule.forFeature([
-      GxaApplicationForm
-    ]),
+    CacheModule.register(),
+    TypeOrmModule.forFeature([GxaApplicationForm]),
   ],
   controllers: [GxaApplicationController],
   providers: [GxaApplicationService],

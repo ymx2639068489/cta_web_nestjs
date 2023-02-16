@@ -7,6 +7,6 @@ export class UpdateGxaApplicationFormDto extends PartialType(
     'teamName',
     'group',
     'teamMemberSpecialty',
-    'introductionToWorks'
+    'introductionToWorks',
   ]) {}
 ) {}

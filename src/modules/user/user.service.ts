@@ -73,6 +73,13 @@ export class UserService {
     });
   }
 
+  async findOneByQQ(qq: string): Promise<User> {
+    return this.userRepository.findOne({
+      where: { qq },
+      relations: ['identity'],
+    })
+  }
+
   async createUser(
     createUserDto: CreateUserDto,
   ): Promise<Result<string>> {

@@ -7,7 +7,6 @@ import { UserController } from './modules/user/user.controller';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './common/guard/jwt.guard';
 import {
-  GxaWorksModule,
   ActiveTimeModule,
   MessageModule,
   GxaApplicationModule,
@@ -46,7 +45,7 @@ import { HttpModule } from '@nestjs/axios';
     MessageModule,
     ActiveTimeModule,
     GxaApplicationModule,
-    GxaWorksModule,
+    // GxaWorksModule,
     JournalismModule,
     BannerModule,
     ComputerCompetitionModule,

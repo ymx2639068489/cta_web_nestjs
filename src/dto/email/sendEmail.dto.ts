@@ -19,3 +19,11 @@ export class SubmitGxaWorksEmail {
   teamName: string;
   url: string;
 }
+export class InviteGxaByStudentEmail {
+  qq: string;
+  fromUsername: string;
+  toUsername: string;
+  teamName: string;
+  agreenInvitation: string;
+  fromUserId: number | string;
+}

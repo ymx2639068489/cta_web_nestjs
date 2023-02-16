@@ -3,9 +3,9 @@ import { AllGxaWorkDto } from './AllGxaWork.dto';
 
 class temp extends PickType(AllGxaWorkDto, [
   'id',
-  'showImg',
+  'indexHtmlImg',
   'websiteUrl',
-  'websiteIntroduction'
+  'introductionToWorks'
 ]) {}
 
 export class GetAllGxaWorkDto {
