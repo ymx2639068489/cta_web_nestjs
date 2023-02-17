@@ -1,73 +1,27 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# 计算机技术协会
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+由于协会干事招新需要收集简历、网页设计大赛收集报名表会非常繁琐，浪费很多人力物力，特地开发这样的平台来解决这个问题。
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 开发人员
 
-## Description
+计科204余欢、计科201乔虎虎、软件205安友珍
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## 项目其他地址
 
-## Installation
+前台前端：[ymx2639068489/SUSE-CTA-FRONT-CODE (github.com)](https://github.com/ymx2639068489/SUSE-CTA-FRONT-CODE)  or [qiaofufu/suse-cta (github.com)](https://github.com/qiaofufu/suse-cta)
 
-```bash
-$ npm install
-```
+前台后端：[ymx2639068489/cta_web_nestjs: 2022学年网页设计竞赛后端 (github.com)](https://github.com/ymx2639068489/cta_web_nestjs)
 
-## Running the app
+后台前端：[an-and-an/cta_back: 计算机技术协会后台 (github.com)](https://github.com/an-and-an/cta_back)
 
-```bash
-# development
-$ npm run start
+后台后端：[ymx2639068489/cta_web_manager: 2022年国信安作品后台 (github.com)](https://github.com/ymx2639068489/cta_web_manager)
 
-# watch mode
-$ npm run start:dev
+## 项目功能
 
-# production mode
-$ npm run start:prod
-```
+包含但不限于以下模块：国信安、新闻、算法周赛、知识竞赛、投递简历、轮播图、用户、管理员等模块。
 
-## Test
+## 技术栈
 
-```bash
-# unit tests
-$ npm run test
+前端采用`vue3` + `vue-router` + `vuex`进行开发、使用`js-xlsx`库解析`excel`文件，批量导入算法周赛积分.
 
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
+后端采用`nestjs` + `ts` + `swagger`进行开发、使用`typeorm`连接操作数据库，对象关系映射、使用`mailer`发送注册欢迎、组队邀请、公告发送等邮件的发送。

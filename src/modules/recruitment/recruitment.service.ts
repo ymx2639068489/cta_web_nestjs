@@ -19,7 +19,6 @@ export class RecruitmentService {
     private readonly recruitmentRepository: Repository<Recruitment>,
     private readonly userService: UserService,
     private readonly activeTimeService: ActiveTimeService,
-    private readonly messageService: MessageService,
     private readonly emailService: EmailService
   ) {}
 
@@ -124,18 +123,6 @@ export class RecruitmentService {
         qq: data.user.qq,
         username: data.user.username
       })
-      const content = `
-        Hi，${data.user.username}
-          感谢你对计算机技术协会的关注！我们已经收到你的申请表并会认真评估你的干事申请表。
-          通过初步评估后，我们会及时发送消息以及发送邮箱通知你进行后续的操作。
-      `
-      await this.messageService.createOfficialMessage({
-        to:<UserDto>data.user,
-        isNeedToConfirm: false,
-        callback: '',
-        content,
-      })
-      
       return { code: 0, message: '提交成功' };
     } catch (err) {
       return { code: -4, message: err };

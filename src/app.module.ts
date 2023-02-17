@@ -8,7 +8,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './common/guard/jwt.guard';
 import {
   ActiveTimeModule,
-  MessageModule,
+  // MessageModule,
   GxaApplicationModule,
   EmailModule,
   _CommonModule,
@@ -43,7 +43,7 @@ import { HttpModule } from '@nestjs/axios';
     _CommonModule,
     AuthModule,
     EmailModule,
-    MessageModule,
+    // MessageModule,
     ActiveTimeModule,
     GxaApplicationModule,
     // GxaWorksModule,
